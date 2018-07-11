@@ -1,17 +1,17 @@
 import pandas_datareader.data as web
-import pandas as pd
 
 
 class Stock:
     def __init__(self, ticker):
         self.ticker = ticker
+        self.lookup = None  # Define lookup element to troubleshoot
 
     def rb_lookup(self):
         """
         Return 1 year of OHLC and Volume data from robinhood
         """
         temp = web.DataReader(self.ticker, 'robinhood')
-        temp = temp.reset_index()
+        temp = temp.reset_index()  # Remove multiindexing
         temp = temp.drop(columns=["interpolated", "session"])
         temp.rename(
             columns={
@@ -29,6 +29,7 @@ class Stock:
         self.open_price = temp.loc[:, "Open"]
         self.volume = temp.loc[:, "Volume"]
         self.dates = temp.loc[:, "Date"]
+        self.lookup = 'rb'
 
     def morningstar_lookup(self):
         """
@@ -45,21 +46,6 @@ class Stock:
         self.open_price = temp.loc[:, "Open"]
         self.volume = temp.loc[:, "Volume"]
         self.dates = temp.loc[:, "Date"]
+        self.lookup = 'morningstar'
 
 
-#######################################################
-pos_path = 'C:\\Users\\Ward Rushton\\Documents\\Finances\\Portfolio\\2018_06 Portfolio Data\\mod_book1.csv'
-########################################################
-
-positions = pd.read_csv(pos_path)
-tickers = positions['Symbol']
-stockslist = []
-for symbol in tickers:
-    try:
-        symbol = Stock(symbol)
-        symbol.morningstar_lookup()
-        stockslist.append(symbol)
-    except ValueError:
-        stockslist.append(f'ValueError: {symbol}')
-        continue
-ticker_dates_close = [(symbol.ticker, symbol.dates, symbol.close) for symbol in stockslist if type(symbol) != str]

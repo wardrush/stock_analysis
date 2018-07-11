@@ -11,21 +11,24 @@ class Stock:
         Return 1 year of OHLC and Volume data from robinhood
         """
         temp = web.DataReader(self.ticker, 'robinhood')
-        pvtdf = pd.pivot_table(temp, index=['Symbol', 'Date'], values=['high_price'], aggfunc=sum)
-        """
-        #temp = temp.insert(loc=len, column='Date', value=None)
-        #temp = temp.insert(loc=0, column='Symbol', value=None)
         temp = temp.reset_index()
-        self.close_price = temp.loc[:, 'close_price']
-        self.high_price = temp.loc[:, 'high_price']
-        self.low_price = temp.loc[:, 'low_price']
-        self.open_price = temp.loc[:, 'open_price']
-        self.volume = temp.loc[:, 'volume']
-        self.dates = temp.loc[:, '']
-        transdat = temp.loc[:, ["open_price", "high_price", "low_price", "close_price"]]
-        transdat.rename(columns={"open_price": "Open", "high_price": "High", "low_price": "Low", "close_price": "Close"}, inplace=True)
-        print(self.dates)
-        """
+        temp = temp.drop(columns=["interpolated", "session"])
+        temp.rename(
+            columns={
+                "symbol": "Symbol",
+                "begins_at": "Date",
+                "close_price": "Close",
+                "high_price": "High",
+                "low_price": "Low",
+                "open_price": "Open",
+                "volume": "Volume"
+            }, inplace=True)
+        self.close_price = temp.loc[:, "Close"]
+        self.high_price = temp.loc[:, "High"]
+        self.low_price = temp.loc[:, "Low"]
+        self.open_price = temp.loc[:, "Open"]
+        self.volume = temp.loc[:, "Volume"]
+        self.dates = temp.loc[:, "Date"]
 
     def morningstar_lookup(self):
         """
@@ -34,18 +37,14 @@ class Stock:
         No apparent limit to how far back quotes go
         """
         temp = web.DataReader(self.ticker, 'morningstar')
-        temp = temp.reset_index(level=[0, 1])
-        print(temp.head())
-        """
-        self.close_price = temp.loc[:, 'close_price']
-        self.high_price = temp.loc[:, 'high_price']
-        self.low_price = temp.loc[:, 'low_price']
-        self.open_price = temp.loc[:, 'open_price']
-        self.volume = temp.loc[:, 'volume']
-        transdat = temp.loc[:, ["open_price", "high_price", "low_price", "close_price"]]
-        transdat.rename(columns={"open_price": "Open", "high_price": "High", "low_price": "Low", "close_price": "Close"}, inplace=True)
-        print(transdat.head())
-        """
+        temp = temp.reset_index()  # Remove multiindexing
+
+        self.close_price = temp.loc[:, "Close"]
+        self.high_price = temp.loc[:, "High"]
+        self.low_price = temp.loc[:, "Low"]
+        self.open_price = temp.loc[:, "Open"]
+        self.volume = temp.loc[:, "Volume"]
+        self.dates = temp.loc[:, "Date"]
 
 
 #######################################################
@@ -53,8 +52,14 @@ pos_path = 'C:\\Users\\Ward Rushton\\Documents\\Finances\\Portfolio\\2018_06 Por
 ########################################################
 
 positions = pd.read_csv(pos_path)
-tickers = ['O', 'GE']  # positions['Symbol']
+tickers = positions['Symbol']
+stockslist = []
 for symbol in tickers:
-    symbol = Stock(symbol)
-    symbol.rb_lookup()
-    #symbol.morningstar_lookup()
+    try:
+        symbol = Stock(symbol)
+        symbol.morningstar_lookup()
+        stockslist.append(symbol)
+    except ValueError:
+        stockslist.append(f'ValueError: {symbol}')
+        continue
+ticker_dates_close = [(symbol.ticker, symbol.dates, symbol.close) for symbol in stockslist if type(symbol) != str]

@@ -1,0 +1,81 @@
+
+class Stock:
+    def __init__(self, ticker):
+        self.ticker = ticker
+
+    def rb_lookup(self):
+        """
+        Return 1 year of OHLC and Volume data from robinhood
+        """
+        temp = web.DataReader(self.ticker, 'robinhood')
+        self.close_price = temp.loc[:, 'close_price']
+        self.high_price = temp.loc[:, 'high_price']
+        self.low_price = temp.loc[:, 'low_price']
+        self.open_price = temp.loc[:, 'open_price']
+        self.volume = temp.loc[:, 'volume']
+        dates = temp.index[slice(0)]
+        transdat = temp.loc[:, ["open_price", "high_price", "low_price", "close_price"]]
+        transdat.rename(columns={"open_price": "Open", "high_price": "High", "low_price": "Low", "close_price": "Close"}, inplace=True)
+        print(transdat.head())
+
+
+    def morningstar_lookup(self):
+        """
+        OHLC and Volume data from Morningstar.
+        Start and end dates must be specified
+        No apparent limit to how far back quotes go
+        """
+        pass
+
+    def iex_lookup(self):
+        """
+        Investors Exchange (iex) provides up to 5 years of historical quotes
+        'iex-tops' and 'iex-lasts' provide more in depth information
+        """
+        pass
+
+    def enigma_lookup(self):
+        """
+        Large repository of structured public data
+        Requires an API Key
+        """
+        pass
+
+    def quandl_lookup(self):
+        """
+        From pandas-datareader docs:
+        Daily financial data (prices of stocks, ETFs etc.) from Quandl.
+        The symbol names consist of two parts: DB name and symbol name.
+        DB names can be all the free ones listed on the Quandl website.
+        Symbol names vary with DB name; for WIKI (US stocks), they are the common ticker symbols,
+        in some other cases (such as FSE) they can be a bit strange.
+        Some sources are also mapped to suitable ISO country codes in the dot suffix style shown above,
+        currently available for BE, CN, DE, FR, IN, JP, NL, PT, UK, US.
+        """
+        pass
+
+    def fred_lookup(self):
+        pass
+
+    def fama_lookup(self):
+        pass
+
+    def oecd_lookup(self):
+        pass
+
+    def eurostat_lookup(self):
+        pass
+
+    def tsp_lookup(self):
+        pass
+
+    def nasdaq_lookup(self):
+        pass
+
+    def stooq_lookup(self):
+        pass
+
+    def moex_lookup(self):
+        pass
+
+

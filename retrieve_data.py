@@ -1,3 +1,5 @@
+import pandas as pd
+pd.core.common.is_list_like = pd.api.types.is_list_like # Add newer pandas functionality
 import pandas_datareader.data as web
 
 
@@ -29,7 +31,7 @@ class Stock:
         self.open_price = temp.loc[:, "Open"]
         self.volume = temp.loc[:, "Volume"]
         self.dates = temp.loc[:, "Date"]
-        self.lookup = 'rb'
+        self.lookup = 'robinhood'
 
     def morningstar_lookup(self):
         """
@@ -39,7 +41,6 @@ class Stock:
         """
         temp = web.DataReader(self.ticker, 'morningstar')
         temp = temp.reset_index()  # Remove multiindexing
-
         self.close_price = temp.loc[:, "Close"]
         self.high_price = temp.loc[:, "High"]
         self.low_price = temp.loc[:, "Low"]
@@ -48,4 +49,30 @@ class Stock:
         self.dates = temp.loc[:, "Date"]
         self.lookup = 'morningstar'
 
+
+def retrieve_data(ticker, **kwargs):
+    """
+    :type ticker: str
+    Standardize tickers as all uppercase
+    """
+    try:
+        lookup = kwargs.get('lookup', 'morningstar')
+        lookup = lookup.lower()
+
+        if ticker == ticker.upper():
+            ticker = Stock(ticker)
+            if lookup in ('robinhood', 'rb'):
+                ticker.rb_lookup()
+                return ticker
+            elif lookup == 'morningstar':
+                ticker.morningstar_lookup()
+                return ticker
+            else:
+                raise NotImplementedError("Only robinhood and morningstar lookups are supported")
+        elif type(ticker) is str:
+            ticker = ticker.upper()
+            retrieve_data(ticker, lookup=lookup)
+
+    except AttributeError:
+        raise AttributeError("Only string inputs accepted")
 

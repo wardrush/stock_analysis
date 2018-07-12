@@ -1,4 +1,4 @@
-import stockanalysis
+import retrieve_data
 import pandas as pd
 
 #######################################################
@@ -10,7 +10,7 @@ tickers = positions['Symbol']
 stockslist = []
 for symbol in tickers:
     try:
-        symbol = stockanalysis.Stock(symbol)
+        symbol = retrieve_data.Stock(symbol)
         symbol.morningstar_lookup()
         stockslist.append(symbol)
     except ValueError:

@@ -50,13 +50,12 @@ class Stock:
         self.lookup = 'morningstar'
 
 
-def retrieve_data(ticker, **kwargs):
+def retrieve_data(ticker, lookup='morningstar'):
     """
     :type ticker: str
     Standardize tickers as all uppercase
     """
     try:
-        lookup = kwargs.get('lookup', 'morningstar')
         lookup = lookup.lower()
 
         if ticker == ticker.upper():

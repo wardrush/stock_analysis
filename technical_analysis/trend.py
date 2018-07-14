@@ -6,6 +6,24 @@ import pandas as pd
 import numpy as np
 
 
+def sma(close, n_days=200, fillna=False):
+    """
+    Simple Moving Average (SMA)
+    The most basic trend indicator that is simply the equally weighted average of
+    the most recent n_days closing prices
+    https://en.wikipedia.org/wiki/Moving_average
+    Args:
+        close(pandas.Series): dataset 'Close' column.
+        n_days(int): period (n days) for sma
+        fillna(bool): if True, fill nan values.
+    Returns:
+        pandas.Series: nan for first n-1 numbers then the sma for each day
+    """
+    close = pd.Series(close)
+    sma = close.rolling(window=n_days)['MA'].mean()
+    return pd.Series(sma, name=f"{n_days}-SMA")
+
+
 def macd(close, n_fast=12, n_slow=26, fillna=False):
     """Moving Average Convergence Divergence (MACD)
     Is a trend-following momentum indicator that shows the relationship between

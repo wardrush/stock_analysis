@@ -3,7 +3,9 @@ from retrieve_data import retrieve_data
 
 
 class RetrieveDataTest(unittest.TestCase):
-    """Test for data retrieval from implemented sources"""
+    """
+    Test for data retrieval from implemented sources
+    """
 
     def test_real_ticker_default(self):
         retrieve_data('AAPL')
@@ -53,15 +55,6 @@ class RetrieveDataTest(unittest.TestCase):
     def test_other_false_nonstr_datasource(self):
         retrieve_data('AAPL', lookup=[1,2,3,4])
 
-class TechnicalAnalysisTest(unittest.TestCase):
-    """
-    Test the technical analyses using model data
-    """
-
-    def setUp(self):
-        """
-        Create model stock data so that the download data tests can be independent
-        """
 
 if __name__ == '__main__':
     unittest.main

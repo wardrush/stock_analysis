@@ -20,7 +20,7 @@ def sma(close, n_days=200, fillna=False):
         pandas.Series: nan for first n-1 numbers then the sma for each day
     """
     close = pd.Series(close)
-    sma = close.rolling(window=n_days)['MA'].mean()
+    sma = pd.Series.rolling(close, window=n_days).mean()
     return pd.Series(sma, name=f"{n_days}-SMA")
 
 

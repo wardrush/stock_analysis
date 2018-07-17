@@ -1,4 +1,4 @@
-from stock import Stock
+from stock_analysis.stock import Stock  # from .stock import Stock?
 
 
 def retrieve_data(ticker, lookup='morningstar'):

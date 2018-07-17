@@ -15,6 +15,12 @@
 * pandas
 
 
+
+#### To-Do
+* Add logging of trades (Price at entering, # of shares, date, change)
+* Add broker interface
+* Add graphs
+
 #### Notes
 
 

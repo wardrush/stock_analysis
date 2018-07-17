@@ -1,5 +1,5 @@
 import unittest
-from retrieve_data import retrieve_data
+from stock_analysis.retrieve_data import retrieve_data
 
 
 class RetrieveDataTest(unittest.TestCase):

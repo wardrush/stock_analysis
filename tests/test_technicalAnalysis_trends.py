@@ -1,16 +1,12 @@
 import unittest
-from unittest import expectedFailure, skip
 import pandas as pd
-from stock import Stock
+from stock_analysis.stock import Stock
 from technical_analysis import trend
-from technical_analysis import momentum
-from technical_analysis import volatility
-from technical_analysis import volume
 
 
 class TechnicalAnalysisTest(unittest.TestCase):
     """
-    Test the technical analyses using model data
+    Test the technical analyses trend file using model data
     """
 
     @classmethod
@@ -20,8 +16,10 @@ class TechnicalAnalysisTest(unittest.TestCase):
         Use 4 stocks' data: AAPL, GE, JPM, SVU
         """
         print('Creating Testing Class\n')
+        print('Importing Model Data\n')
+
         # AAPL
-        temp = pd.read_csv('AAPL.csv', delimiter='\t')
+        temp = pd.read_csv('../test_data/AAPL.csv', delimiter='\t')
         cls.aapl = Stock('AAPL')
         cls.aapl.open = temp['Open']
         cls.aapl.high = temp['High']
@@ -29,7 +27,7 @@ class TechnicalAnalysisTest(unittest.TestCase):
         cls.aapl.close = temp['Close']
         cls.aapl.lookup = 'Testing'
         # GE
-        temp = pd.read_csv('GE.csv', delimiter='\t')
+        temp = pd.read_csv('../test_data/GE.csv', delimiter='\t')
         cls.ge = Stock('GE')
         cls.ge.open = temp['Open']
         cls.ge.high = temp['High']
@@ -37,7 +35,7 @@ class TechnicalAnalysisTest(unittest.TestCase):
         cls.ge.close = temp['Close']
         cls.ge.lookup = 'Testing'
         # JPM
-        temp = pd.read_csv('JPM.csv', delimiter='\t')
+        temp = pd.read_csv('../test_data/JPM.csv', delimiter='\t')
         cls.jpm = Stock('JPM')
         cls.jpm.open = temp['Open']
         cls.jpm.high = temp['High']
@@ -45,13 +43,30 @@ class TechnicalAnalysisTest(unittest.TestCase):
         cls.jpm.close = temp['Close']
         cls.jpm.lookup = 'Testing'
         # SVU
-        temp = pd.read_csv('SVU.csv', delimiter='\t')
+        temp = pd.read_csv('../test_data/SVU.csv', delimiter='\t')
         cls.svu = Stock('SVU')
         cls.svu.open = temp['Open']
         cls.svu.high = temp['High']
         cls.svu.low = temp['Low']
         cls.svu.close = temp['Close']
         cls.svu.lookup = 'Testing'
+
+        # Manually Calculated Solutions
+        """
+        print('Importing Manually Calculated Solutions\n')
+        # AAPL
+        cls.aapl.solns = pd.read_csv('AAPL_SOLNS.csv', delimiter='\t')
+
+        # GE
+        cls.ge.solns = pd.read_csv('GE_SOLNS.csv', delimiter='\t')
+
+        # JPM
+        cls.jpm.solns = pd.read_csv('JPM_SOLNS.csv', delimiter='\t')
+
+        # SVU
+        cls.svu.solns = pd.read_csv('SVU_SOLNS.csv', delimiter='\t')
+        """
+
 
     @classmethod
     def tearDownClass(cls):
@@ -65,12 +80,13 @@ class TechnicalAnalysisTest(unittest.TestCase):
     """
     # Test SMA
     def test_sma_default_days(self):
-        print(trend.sma(self.aapl.close))
+        sma_series = trend.sma(self.aapl.close)
+        print(sma_series)
 
     def test_sma_50_days(self):
         pass
 
-    @expectedFailure
+    # @expectedFailure
     def test_sma_nonint_days(self):
         pass
 
@@ -85,33 +101,7 @@ class TechnicalAnalysisTest(unittest.TestCase):
     # Test KST and KST_signal
     # Test Ichimoku, Ichimoku_b
 
-    """
-    Testing Momentum
-    RSI, MFI, and TSI
-    """
-    # Test RSI
-    # Test MFI
-    # Test TSI
 
-    """
-    Testing Volatility
-    ATR, Bollinger, KC, and DC
-    """
-    # Test ATR
-    # Test Bollinger
-    # Test KC
-    # Test DC
-
-    """
-    Testing Volume
-    ADI, OBV, OBV_mean, CMF, FI, EoM, and VPT 
-    """
-    # Test ADI
-    # Test OBV, OBV_mean
-    # Test CMF
-    # Test FI
-    # Test EoM
-    # Test VPT
 
 
 

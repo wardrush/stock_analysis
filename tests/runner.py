@@ -4,11 +4,11 @@ import unittest
 Import test modules
 """
 # Import Data Retrieval
-import test_retrieveData
+import tests.test_retrieveData
 
 
 # Import Technical Analysis
-import test_technicalAnalysis_trends
+from stock_analysis.technical_analysis import technical_analysis.trends
 import test_technicalAnalysis_momentum
 import test_technicalAnalysis_volatility
 import test_technicalAnalysis_volume

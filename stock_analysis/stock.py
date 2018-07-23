@@ -1,4 +1,6 @@
 import pandas as pd
+from stock_analysis.technical_analysis import trend
+from stock_analysis.technical_analysis import momentum
 pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas functionality
 import pandas_datareader.data as web
 import requests
@@ -15,26 +17,31 @@ class Stock:
         """
         Return 1 year of OHLC and Volume data from robinhood
         """
-        temp = web.DataReader(self.ticker, 'robinhood')
-        temp = temp.reset_index()  # Remove multiindexing
-        temp = temp.drop(columns=["interpolated", "session"])
-        temp.rename(
-            columns={
-                "symbol": "Symbol",
-                "begins_at": "Date",
-                "close_price": "Close",
-                "high_price": "High",
-                "low_price": "Low",
-                "open_price": "Open",
-                "volume": "Volume"
-            }, inplace=True)
-        self.close = temp.loc[:, "Close"]
-        self.high = temp.loc[:, "High"]
-        self.low = temp.loc[:, "Low"]
-        self.open = temp.loc[:, "Open"]
-        self.volume = temp.loc[:, "Volume"]
-        self.dates = temp.loc[:, "Date"]
-        self.lookup = 'robinhood'
+        try:
+            temp = web.DataReader(self.ticker, 'robinhood')
+            temp = temp.reset_index()  # Remove multiindexing
+            temp = temp.drop(columns=["interpolated", "session"])
+            temp.rename(
+                columns={
+                    "symbol": "Symbol",
+                    "begins_at": "Date",
+                    "close_price": "Close",
+                    "high_price": "High",
+                    "low_price": "Low",
+                    "open_price": "Open",
+                    "volume": "Volume"
+                }, inplace=True)
+            self.close = temp.loc[:, "Close"]
+            self.high = temp.loc[:, "High"]
+            self.low = temp.loc[:, "Low"]
+            self.open = temp.loc[:, "Open"]
+            self.volume = temp.loc[:, "Volume"]
+            self.dates = temp.loc[:, "Date"]
+            self.lookup = 'robinhood'
+        except AttributeError as e:
+            raise AttributeError('Only string lookups supported')
+
+
 
     def morningstar_lookup(self):
         """
@@ -42,21 +49,24 @@ class Stock:
         Start and end dates must be specified
         No apparent limit to how far back quotes go
         """
-        temp = web.DataReader(self.ticker, 'morningstar')
-        temp = temp.reset_index()  # Remove multiindexing
-        self.close = temp.loc[:, "Close"]
-        self.high = temp.loc[:, "High"]
-        self.low = temp.loc[:, "Low"]
-        self.open = temp.loc[:, "Open"]
-        self.volume = temp.loc[:, "Volume"]
-        self.dates = temp.loc[:, "Date"]
-        self.lookup = 'morningstar'
+        try:
+            temp = web.DataReader(self.ticker, 'morningstar')
+            temp = temp.reset_index()  # Remove multiindexing
+            self.close = temp.loc[:, "Close"]
+            self.high = temp.loc[:, "High"]
+            self.low = temp.loc[:, "Low"]
+            self.open = temp.loc[:, "Open"]
+            self.volume = temp.loc[:, "Volume"]
+            self.dates = temp.loc[:, "Date"]
+            self.lookup = 'morningstar'
+        except AttributeError as e:
+            raise AttributeError('Only string lookups supported')
+
 
     # Begin filtering functions
     def filter_price(self, min_price):
         is_valid = (self.close > min_price).any()
         return is_valid
-
 
     def filter_avg_vol(self, n_days=50, min_volume=500000):
         is_valid = self.volume.tail(n_days).mean() > min_volume
@@ -67,3 +77,21 @@ class Stock:
         if self.issueType in accepted_issue_types:
             is_valid = True
         return is_valid
+
+    def filter_rsi(self, n_days=3, **kwargs):
+        rsi = momentum.rsi(self.close, n_days).tail(1).iloc[-1]
+        if 'min_val' in kwargs:
+            if rsi >= kwargs['min_val']:
+                is_valid = True
+            else:
+                is_valid = False
+        elif 'max_val' in kwargs:
+            if rsi <= kwargs['max_val']:
+                is_valid = True
+            else:
+                is_valid = False
+        return is_valid
+
+
+
+

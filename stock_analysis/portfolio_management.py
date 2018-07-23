@@ -1,31 +1,23 @@
 import pandas as pd
+#from pandas import ExcelWriter
+#from pandas import ExcelFile
+import os
+
+if os.path.isfile('Trades.csv'):
+    trades = pd.read_csv('Trades.csv')
+else:
+    pd.DataFrame(columns=['Date', 'Symbol', 'Purchase?', 'Price per Share', 'Number of Shares',
+                          'Total Cost', 'Running Return']).to_csv('Trades.csv', index=False)
+
+# TODO Figure out to deal with portfolio
+if os.path.isfile('Portfolio.csv'):
+    portfolio = pd.read_csv('Portfolio.csv')
 
 
-def daily_return(close, fillna=False):
-    """Daily Return (DR)
-    Args:
-        close(pandas.Series): dataset 'Close' column.
-        fillna(bool): if True, fill nan values.
-    Returns:
-        pandas.Series: New feature generated.
-    """
-    dr = (close / close.shift(1)) - 1
-    dr *= 100
-    if fillna:
-        dr = dr.fillna(0)
-    return pd.Series(dr, name='d_ret')
-
-
-def cumulative_return(close, fillna=False):
-    """Cumulative Return (CR)
-    Args:
-        close(pandas.Series): dataset 'Close' column.
-        fillna(bool): if True, fill nan values.
-    Returns:
-        pandas.Series: New feature generated.
-    """
-    cr = (close / close.iloc[0]) - 1
-    cr *= 100
-    if fillna:
-        cr = cr.fillna(method='backfill')
-    return pd.Series(cr, name='cum_ret')
+"""
+Need to track:
+1. total equity
+2. Positions
+3. Commission
+4. risk adjusted returns
+"""

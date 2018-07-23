@@ -19,7 +19,7 @@ Position Sizing:
 - Each positions risks 2% of total equity [(entry - stop loss) * # of shares]
     i.e. If entry = 20 USD, stop loss = 17 USD, and equity = 100,000 USD -> Dollar risk per share = 3 USD
          Therefore the position should be (2% * total equity) / cost per share -> 2,000 USD / 3 USD = 666 shares
-- Max size is 10 % of equity. Following up with above calculation, the position would be 666 * 3 USD = 13, 320 USD
+- Max size is 10 % of equity. Following up with above calculation, the position would be 666 * 3 USD = 13,320 USD
     That is too big, so it would be clipped to 10,000 USD -> 500 shares
 
 Entry Rules:
@@ -40,3 +40,7 @@ Exit:
 - When 4 days have passed without either of above, exit market on close **Maybe change to open**
 """
 
+sma_days = 150
+adx_days = 7
+adr_days = 10
+rsi_days = 3

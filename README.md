@@ -13,6 +13,7 @@
 #### Requirements
 * pandas_datareader
 * pandas
+* requests
 
 
 

@@ -62,7 +62,6 @@ class Stock:
         except AttributeError as e:
             raise AttributeError('Only string lookups supported')
 
-
     # Begin filtering functions
     def filter_price(self, min_price):
         is_valid = (self.close > min_price).any()
@@ -91,6 +90,26 @@ class Stock:
             else:
                 is_valid = False
         return is_valid
+
+    def filter_adx(self, n_days=7):
+        pass
+
+    def filter_adr(self, n_days=10):
+        pass
+
+    # Functions for calculating entrance/exit strategy
+    def stop_2_5x_atr(self, n_days=10):
+        pass
+
+    def stop_n_pct_profit(self, entrance_price, profit=0.03):
+        pass
+
+    def stop_n_days_inactive(self, entrance_date, n_days=2):
+        pass
+
+    def
+
+
 
 
 

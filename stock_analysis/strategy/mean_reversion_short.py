@@ -37,3 +37,29 @@ Exit:
 - When position has made >= 4% profit, close on next day open
 - When 2 days have passed without either of above, exit market on close **Maybe change to open**
 """
+from stock_analysis.stock import Stock
+from stock_analysis import sp500_above_200_sma_w_buffer
+from stock_analysis.technical_analysis import trend
+import pandas as pd
+
+# Trading universe is sp500
+trading_universe = list(open('sp500.txt').readlines())
+potential_trades_tickers = []
+potential_trades_200dayROC = []
+
+
+# Filters:
+def mean_reversion_short_filters(stock):
+    if stock.filter_price(min_price=10) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
+            stock.filter_issue_type() & stock.filter_rsi(n_days=3, min_val=85) & stock.filter_n_day_adx(n_days)
+        return True
+
+
+for ticker in trading_universe:
+    ticker = Stock(ticker)
+    ticker.morningstar_lookup()
+    if mean_reversion_short_filters(ticker):
+        potential_trades_tickers.append(ticker.ticker)
+        potential_trades_200dayROC.append(trend.roc(ticker.close).tail(1).iloc[-1])
+temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
+potential_trades = pd.DataFrame(temp, columns=['Symbol', '200 Day ROC']).sort_values(by=potential_trades_200dayROC)

@@ -39,6 +39,19 @@ Exit:
 - When position has made >= 3% profit, close on next day open
 - When 4 days have passed without either of above, exit market on close **Maybe change to open**
 """
+from stock_analysis.stock import Stock
+from stock_analysis.technical_analysis import trend
+import pandas as pd
+
+# Trading universe is AMEX, NYSE, NASDAQ
+amex = pd.read_csv('amex.csv').iloc[:,0]
+nyse = pd.read_csv('nyse.csv').iloc[:,0]
+nasdaq = pd.read_csv('nasdaq.csv').iloc[:,0]
+trading_universe = amex.append([nyse, nasdaq]).sort_values()
+
+potential_trades_tickers = []
+potential_trades_200dayROC = []
+
 
 sma_days = 150
 adx_days = 7

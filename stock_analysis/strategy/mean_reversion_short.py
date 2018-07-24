@@ -41,13 +41,17 @@ from stock_analysis.stock import Stock
 from stock_analysis import sp500_above_200_sma_w_buffer
 from stock_analysis.technical_analysis import trend
 import pandas as pd
+import os
 
-# Trading universe is sp500
-trading_universe = list(open('sp500.txt').readlines())
+# Trading universe is AMEX, NYSE, NASDAQ
+amex = pd.read_csv(os.path.join('exchanges', 'amex.csv')).iloc[:,0]
+nyse = pd.read_csv(os.path.join('exchanges', 'nyse.csv')).iloc[:,0]
+nasdaq = pd.read_csv(os.path.join('exchanges', 'nasdaq.csv')).iloc[:,0]
+trading_universe = amex.append([nyse, nasdaq]).sort_values()
 potential_trades_tickers = []
 potential_trades_200dayROC = []
 
-
+"""
 # Filters:
 def mean_reversion_short_filters(stock):
     if stock.filter_price(min_price=10) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
@@ -63,3 +67,4 @@ for ticker in trading_universe:
         potential_trades_200dayROC.append(trend.roc(ticker.close).tail(1).iloc[-1])
 temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
 potential_trades = pd.DataFrame(temp, columns=['Symbol', '200 Day ROC']).sort_values(by=potential_trades_200dayROC)
+"""

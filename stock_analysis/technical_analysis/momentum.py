@@ -1,6 +1,24 @@
 import pandas as pd
 
 
+def roc(close, n_days=200, fillna=False ):
+    """
+    Rate of Change (ROC)
+    Is the purest momentum technical indicator. It is simply the difference in closing prices
+     over the earlier closing price
+    :param close:
+    :param n_days:
+    :param fillna:
+    :return:
+    """
+
+    M = close.diff(n_days - 1)
+    N = close.shift(n_days - 1)
+    roc = pd.Series(((close.diff(n_days - 1) / close.shift(n_days - 1)) * 100))
+    return roc
+
+
+
 def rsi(close, n=14, fillna=False):
     """Relative Strength Index (RSI)
     Compares the magnitude of recent gains and losses over a specified time

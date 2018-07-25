@@ -1,10 +1,12 @@
 import pandas as pd
 import requests
+from functools import wraps
 from datetime import datetime, timedelta
 from stock_analysis.technical_analysis import trend
 from stock_analysis.technical_analysis import momentum
 pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas functionality to datareader
 import pandas_datareader.data as web
+
 
 
 class Stock:
@@ -17,9 +19,6 @@ class Stock:
                 f'https://api.iextrading.com/1.0/stock/{self.ticker}/company').json()['issueType']
         except: # Find the particular exception for not having internet
             self.issueType = None
-
-
-
 
     def rb_lookup(self):
         """

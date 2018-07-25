@@ -31,12 +31,14 @@ Exit:
 - When SPY is below the 200-SMA with a 2% downside buffer at end of week close
 """
 from stock_analysis.stock import Stock
-from stock_analysis.technical_analysis import trend
+from stock_analysis.technical_analysis import momentum
 import pandas as pd
 import os
 
 # Trading universe is sp500
-trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500.csv')).iloc[:,0].sort_values() # Choose first column to get tickers
+# Choose first column to get tickers
+#trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500.csv')).iloc[:,0].sort_values()
+trading_universe = pd.read_csv(os.path.join('exchanges', '50big.csv')).iloc[:,0]
 potential_trades_tickers = []
 potential_trades_200dayROC = []
 sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
@@ -55,11 +57,14 @@ if sp500_filter: # So that the calculation does not have to happen more than onc
         ticker.morningstar_lookup()
         if weekly_rotation_filters(ticker):
             potential_trades_tickers.append(ticker.ticker)
-            potential_trades_200dayROC.append(trend.roc(ticker.close).tail(1).iloc[-1])
+            #print(momentum.roc(ticker.close))
+            potential_trades_200dayROC.append(momentum.roc(ticker.close).tail(1).iloc[-1])
         print(f'Checked {ticker.ticker}; Status: {weekly_rotation_filters(ticker)}')
     temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
-    potential_trades = pd.DataFrame(temp, columns=['Symbol', '200 Day ROC']).sort_values(by=potential_trades_200dayROC)
+    potential_trades = pd.DataFrame(temp,
+                                    columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC', ascending=False)
 else:
     potential_trades = 'Market is unfavorable. Close current positions and do not open new ones'
 
 
+print(potential_trades)

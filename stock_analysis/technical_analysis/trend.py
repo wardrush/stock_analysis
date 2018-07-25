@@ -430,18 +430,7 @@ def dpo(close, n=20, fillna=False):
     return pd.Series(dpo, name='dpo_'+str(n))
 
 
-def roc(close, n_days=200, fillna=False ):
-    """
-    Rate of Change (ROC)
-    Is the purest momentum technical indicator. It is simply the difference in closing prices
-     over the earlier closing price
-    :param close:
-    :param n_days:
-    :param fillna:
-    :return:
-    """
-    roc = ((close - close.shift(n_days)) / close.shift(n_days)).rolling(n_days).mean()
-    return roc
+
 
 
 def kst(close, r1=10, r2=15, r3=20, r4=30, n1=10, n2=10, n3=10, n4=15, fillna=False):

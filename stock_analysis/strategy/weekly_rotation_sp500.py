@@ -37,11 +37,11 @@ import os
 
 # Trading universe is sp500
 # Choose first column to get tickers
-#trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500.csv')).iloc[:,0].sort_values()
-trading_universe = pd.read_csv(os.path.join('exchanges', '50big.csv')).iloc[:,0]
+trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500.csv')).iloc[:,0].sort_values()
+#trading_universe = pd.read_csv(os.path.join('exchanges', '50big.csv')).iloc[:,0]
 potential_trades_tickers = []
 potential_trades_200dayROC = []
-sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
+sp500_filter = True # Stock.filter_sp500_200day_sma_w_buffer()
 
 
 # Filters:

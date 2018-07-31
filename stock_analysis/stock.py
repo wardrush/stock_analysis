@@ -19,11 +19,7 @@ class Stock:
         except: # Find the particular exception for not having internet
             self.issueType = None
 
-    def rb_api_lookup(self):
-        """
-        Directly use robinhood API data intead of pandas datareader
-        :return:
-        """
+
 
 
     def rb_lookup(self):

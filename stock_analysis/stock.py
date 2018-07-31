@@ -1,7 +1,6 @@
 import pandas as pd
 import requests
 from datetime import datetime, timedelta
-from stock_analysis.timeout import timeout, handler
 from stock_analysis.technical_analysis import trend
 from stock_analysis.technical_analysis import momentum
 pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas functionality to datareader
@@ -20,7 +19,13 @@ class Stock:
         except: # Find the particular exception for not having internet
             self.issueType = None
 
-    @timeout()
+    def rb_api_lookup(self):
+        """
+        Directly use robinhood API data intead of pandas datareader
+        :return:
+        """
+
+
     def rb_lookup(self):
         """
         Return 1 year of OHLC and Volume data from robinhood
@@ -49,7 +54,7 @@ class Stock:
         except AttributeError as e:
             raise AttributeError('Only string lookups supported')
 
-    @timeout()
+
     def morningstar_lookup(self, days_ago=300):
         """
         OHLC and Volume data from Morningstar.
@@ -94,7 +99,6 @@ class Stock:
             sp500_above_200_sma_w_buffer = True
         return sp500_above_200_sma_w_buffer
 
-    @handler
     def filter_price(self, min_price):
         try:
             is_valid = (self.close > min_price).any()
@@ -102,19 +106,19 @@ class Stock:
             is_valid = False
         return is_valid
 
-    @handler
+
     def filter_avg_vol(self, n_days=50, min_volume=500000):
         is_valid = self.volume.tail(n_days).mean() > min_volume
         return is_valid
 
-    @handler
+
     def filter_issue_type(self, accepted_issue_types=['cs']):
         is_valid = False
         if self.issueType in accepted_issue_types:
             is_valid = True
         return is_valid
 
-    @handler
+
     def filter_rsi(self, n_days=3, **kwargs):
         rsi = momentum.rsi(self.close, n_days).tail(1).iloc[-1]
         if 'min_val' in kwargs:

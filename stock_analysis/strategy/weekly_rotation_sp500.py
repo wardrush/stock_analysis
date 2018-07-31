@@ -37,7 +37,11 @@ import os
 
 # Trading universe is sp500
 # Choose first column to get tickers
-trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500.csv')).iloc[:,0].sort_values()
+"""
+I'm using the cleaned file because I do not have an effective timeout decorator yet, so the program will get stuck on 
+any ticker that does not validate
+"""
+trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
 #trading_universe = pd.read_csv(os.path.join('exchanges', '50big.csv')).iloc[:,0]
 potential_trades_tickers = []
 potential_trades_200dayROC = []
@@ -54,12 +58,12 @@ def weekly_rotation_filters(stock):
 if sp500_filter: # So that the calculation does not have to happen more than once
     for ticker in trading_universe:
         ticker = Stock(ticker)
+        print(f'Checking stock: {ticker.ticker}')
         ticker.morningstar_lookup()
         if weekly_rotation_filters(ticker):
             potential_trades_tickers.append(ticker.ticker)
-            #print(momentum.roc(ticker.close))
             potential_trades_200dayROC.append(momentum.roc(ticker.close).tail(1).iloc[-1])
-        print(f'Checked {ticker.ticker}; Status: {weekly_rotation_filters(ticker)}')
+        #print(f'Checked {ticker.ticker}; Status: {weekly_rotation_filters(ticker)}')
     temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
     potential_trades = pd.DataFrame(temp,
                                     columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC', ascending=False)

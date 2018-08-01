@@ -5,8 +5,10 @@ import requests
 def retrieve_data(symbols, debug=False):
     """
     Use Robinhood's API to get one year of historical data for each symbol called.
-    :param symbols:
-    :return either data or list of data objects depending on the number of calls that are requested (>=75):
+    :param symbols: string or list of stock symbols used when finding historical data
+    :param debug: bool If == True, opens a section of code that prints out api calls to help troubleshoot errors
+    :return: Only mildly processed formerly-JSON data from Robinhood. Use 'clean_data' function to put into dataframes
+    :rtype: list
     """
     historical_endpoint = "https://api.robinhood.com/quotes/historicals/"
 
@@ -38,7 +40,36 @@ def retrieve_data(symbols, debug=False):
                         print(check_list[-1])
                         if int(check_list[-1][1]) != 200:
                             print(f'{check_list[-1][0]} Did not receive a good response from server')
-        return data_list
+
+    return data_list
+
+
+def clean_data(data_list):
+    """
+    Take the data from function 'retrieve_data' and make it usable in pandas dataframes
+    :param data_list:
+    :return:
+    """
+    """
+    temp.rename(
+        columns={
+            "symbol": "Symbol",
+            "begins_at": "Date",
+            "close_price": "Close",
+            "high_price": "High",
+            "low_price": "Low",
+            "open_price": "Open",
+            "volume": "Volume"
+        }, inplace=True)
+    self.close = temp.loc[:, "Close"]
+    self.high = temp.loc[:, "High"]
+    self.low = temp.loc[:, "Low"]
+    self.open = temp.loc[:, "Open"]
+    self.volume = temp.loc[:, "Volume"]
+    self.dates = temp.loc[:, "Date"]
+    self.lookup = 'robinhood'
+    """
+    pass
 
 searches = big50.iloc[:,0].sort_values()
 result = retrieve_data(searches, debug=True)

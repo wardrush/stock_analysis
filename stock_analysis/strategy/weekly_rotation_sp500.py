@@ -42,7 +42,7 @@ I'm using the cleaned file because I do not have an effective timeout decorator 
 any ticker that does not validate
 """
 trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
-#trading_universe = pd.read_csv(os.path.join('exchanges', '50big.csv')).iloc[:,0]
+#trading_universe = pd.read_csv(os.path.join('exchanges', 'big50.csv')).iloc[:,0]
 potential_trades_tickers = []
 potential_trades_200dayROC = []
 sp500_filter = True # Stock.filter_sp500_200day_sma_w_buffer()

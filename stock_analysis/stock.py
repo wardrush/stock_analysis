@@ -7,8 +7,12 @@ pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas func
 import pandas_datareader.data as web
 
 
-
 class Stock:
+    """The main class for passing information through this package-holds various relevant data to stock analysis
+
+
+
+    """
     def __init__(self, ticker):
         self.ticker = ticker
         self.lookup = None  # Define lookup element to troubleshoot

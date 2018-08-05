@@ -32,20 +32,16 @@ Exit:
 """
 from stock_analysis.stock import Stock
 from stock_analysis.technical_analysis import momentum
+
+from stock_analysis.exchanges import sp500_cleaned
 import pandas as pd
 import os
 
-# Trading universe is sp500
-# Choose first column to get tickers
-"""
-I'm using the cleaned file because I do not have an effective timeout decorator yet, so the program will get stuck on 
-any ticker that does not validate
-"""
+#trading_universe = sp500_cleaned.iloc[:, 0].sort_values()
 trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
-#trading_universe = pd.read_csv(os.path.join('exchanges', 'big50.csv')).iloc[:,0]
 potential_trades_tickers = []
 potential_trades_200dayROC = []
-sp500_filter = True # Stock.filter_sp500_200day_sma_w_buffer()
+sp500_filter = True #Stock.filter_sp500_200day_sma_w_buffer()
 
 
 # Filters:
@@ -59,7 +55,7 @@ if sp500_filter: # So that the calculation does not have to happen more than onc
     for ticker in trading_universe:
         ticker = Stock(ticker)
         print(f'Checking stock: {ticker.ticker}')
-        ticker.morningstar_lookup()
+        ticker.rb_lookup()
         if weekly_rotation_filters(ticker):
             potential_trades_tickers.append(ticker.ticker)
             potential_trades_200dayROC.append(momentum.roc(ticker.close).tail(1).iloc[-1])

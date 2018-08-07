@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from datetime import datetime, timedelta
+from stock_analysis.retrieve_data import retrieve_single_data, clean_single_data
 from stock_analysis.technical_analysis.trend import sma
 from stock_analysis.technical_analysis import momentum
 pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas functionality to datareader
@@ -16,12 +17,22 @@ class Stock:
     def __init__(self, ticker):
         self.ticker = ticker
         self.lookup = None  # Define lookup element to troubleshoot
-        try:
-            # Using Requests, 1. lookup company type 2. Decode JSON 3. Choose information from key 'issueType'
-            self.issueType = requests.get(
-                f'https://api.iextrading.com/1.0/stock/{self.ticker}/company').json()['issueType']
-        except: # Find the particular exception for not having internet
-            self.issueType = None
+        self.issueType = None
+
+    def get_issueType(self):
+        # Using Requests, 1. lookup company type 2. Decode JSON 3. Choose information from key 'issueType'
+        self.issueType = requests.get(
+            f'https://api.iextrading.com/1.0/stock/{self.ticker}/company').json()['issueType']
+
+    def rb_api_lookup(self):
+        temp = clean_single_data(retrieve_single_data(self.ticker))
+        self.close = pd.to_numeric(temp.loc[:, "Close"])
+        self.high = temp.loc[:, "High"]
+        self.low = temp.loc[:, "Low"]
+        self.open = temp.loc[:, "Open"]
+        self.volume = temp.loc[:, "Volume"]
+        self.dates = temp.loc[:, "Date"]
+        self.lookup = 'robinhood_api'
 
     def rb_lookup(self):
         """
@@ -112,10 +123,14 @@ class Stock:
         return is_valid
 
 
-    def filter_issue_type(self, accepted_issue_types=['cs']):
+    def filter_issue_type(self, accepted_issue_types=None, non_accepted_issue_types=None):
         is_valid = False
-        if self.issueType in accepted_issue_types:
-            is_valid = True
+        if accepted_issue_types:
+            if self.issueType in accepted_issue_types:
+                is_valid = True
+        elif non_accepted_issue_types:
+            if self.issueType in non_accepted_issue_types:
+                is_valid = False
         return is_valid
 
 
@@ -131,6 +146,8 @@ class Stock:
                 is_valid = True
             else:
                 is_valid = False
+        else:
+            is_valid = False
         return is_valid
 
     def filter_adx(self, n_days=7):

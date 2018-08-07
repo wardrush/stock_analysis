@@ -50,10 +50,22 @@ nasdaq = pd.read_csv('nasdaq.csv').iloc[:,0]
 trading_universe = amex.append([nyse, nasdaq]).sort_values()
 
 potential_trades_tickers = []
-potential_trades_200dayROC = []
+potential_trades_3DayRSI = []
 
 
-sma_days = 150
-adx_days = 7
-adr_days = 10
-rsi_days = 3
+# Filters
+def mean_reversion_long_filters(stock):
+    if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
+            stock.filter_issue_type('cs') & stock.filter_rsi(n_days=3, max_val=30) & stock.filter_n_day_adx(7)
+        return True
+
+
+for ticker in trading_universe:
+    ticker = Stock(ticker)
+    ticker.morningstar_lookup()
+    if mean_reversion_long_filters(ticker):
+        potential_trades_tickers.append(ticker.ticker)
+        potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
+temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
+potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_200dayROC,
+                                                                                   ascending=False)

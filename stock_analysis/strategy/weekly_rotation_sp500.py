@@ -32,39 +32,58 @@ Exit:
 """
 from stock_analysis.stock import Stock
 from stock_analysis.technical_analysis import momentum
+import datetime
 
 from stock_analysis.exchanges import sp500_cleaned
 import pandas as pd
 import os
 
-#trading_universe = sp500_cleaned.iloc[:, 0].sort_values()
-trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
-potential_trades_tickers = []
-potential_trades_200dayROC = []
-sp500_filter = True #Stock.filter_sp500_200day_sma_w_buffer()
+def weekly_rotation_sp500():
+
+    #trading_universe = sp500_cleaned.iloc[:, 0].sort_values()
+    trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
+    potential_trades_tickers = []
+    potential_trades_200dayROC = []
+    sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
 
 
-# Filters:
-def weekly_rotation_filters(stock):
-    if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=20, min_volume=1000000) & \
-            stock.filter_issue_type() & stock.filter_rsi(n_days=3, max_val=50):
-        return True
+    # Filters:
+    def weekly_rotation_filters(stock, debug=False):
+        if debug:
+            price_filter = stock.filter_price(min_price=1)
+            avg_vol_filter = stock.filter_avg_vol(n_days=20, min_volume=1000000)
+            issue_type_filter = stock.filter_issue_type(accepted_issue_types=['cs'])
+            rsi_filter = stock.filter_rsi(n_days=3, max_val=50)
+            if price_filter & avg_vol_filter & issue_type_filter & rsi_filter:
+                return True
+
+        else:
+            if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=20, min_volume=1000000) & \
+                    stock.filter_issue_type(accepted_issue_types=['cs']) & stock.filter_rsi(n_days=3, max_val=50):
+                return True
 
 
-if sp500_filter: # So that the calculation does not have to happen more than once
-    for ticker in trading_universe:
-        ticker = Stock(ticker)
-        print(f'Checking stock: {ticker.ticker}')
-        ticker.rb_lookup()
-        if weekly_rotation_filters(ticker):
-            potential_trades_tickers.append(ticker.ticker)
-            potential_trades_200dayROC.append(momentum.roc(ticker.close).tail(1).iloc[-1])
-        #print(f'Checked {ticker.ticker}; Status: {weekly_rotation_filters(ticker)}')
-    temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
-    potential_trades = pd.DataFrame(temp,
-                                    columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC', ascending=False)
-else:
-    potential_trades = 'Market is unfavorable. Close current positions and do not open new ones'
 
 
-print(potential_trades)
+
+    if sp500_filter: # So that the calculation does not have to happen more than once
+        for ticker in trading_universe:
+            ticker = Stock(ticker)
+            ticker.get_issueType()
+
+            ticker.rb_api_lookup()
+            if weekly_rotation_filters(ticker, debug=True):
+                potential_trades_tickers.append(ticker.ticker)
+                potential_trades_200dayROC.append(momentum.roc(ticker.close).tail(1).iloc[-1])
+            print(f'Checking stock: {ticker.ticker}. Potential Trade?: '
+                  f'{"Yes" if weekly_rotation_filters(ticker) else "No"}')
+        temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
+        potential_trades = pd.DataFrame(temp,
+                                        columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC', ascending=False)
+    else:
+        potential_trades = 'Market is unfavorable. Close current positions and do not open new ones'
+
+
+    print(potential_trades)
+    potential_trades.to_csv(f'WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
+

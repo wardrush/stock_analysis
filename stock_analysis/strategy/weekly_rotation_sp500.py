@@ -30,24 +30,17 @@ Exit:
 - When stock is no longer in the top 10 S&P 500 ranked (replace with new outranker)
 - When SPY is below the 200-SMA with a 2% downside buffer at end of week close
 """
-from stock_analysis.stock import Stock
-from stock_analysis.technical_analysis import momentum
 import datetime
-
-from stock_analysis.exchanges import sp500_cleaned
 import pandas as pd
 import os
 
+from stock_analysis.stock import Stock
+from stock_analysis.technical_analysis import momentum
+from stock_analysis.exchanges import sp500_cleaned
+
+
 def weekly_rotation_sp500():
 
-    #trading_universe = sp500_cleaned.iloc[:, 0].sort_values()
-    trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
-    potential_trades_tickers = []
-    potential_trades_200dayROC = []
-    sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
-
-
-    # Filters:
     def weekly_rotation_filters(stock, debug=False):
         if debug:
             price_filter = stock.filter_price(min_price=1)
@@ -62,15 +55,17 @@ def weekly_rotation_sp500():
                     stock.filter_issue_type(accepted_issue_types=['cs']) & stock.filter_rsi(n_days=3, max_val=50):
                 return True
 
-
-
-
+    print('Beginning analysis for Weekly Rotation Strategy')
+    trading_universe = sp500_cleaned.iloc[:, 0].sort_values()
+    # trading_universe = pd.read_csv(os.path.join('exchanges', 'sp500_cleaned.csv')).iloc[:,0].sort_values()
+    potential_trades_tickers = []
+    potential_trades_200dayROC = []
+    sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
 
     if sp500_filter: # So that the calculation does not have to happen more than once
         for ticker in trading_universe:
             ticker = Stock(ticker)
             ticker.get_issueType()
-
             ticker.rb_api_lookup()
             if weekly_rotation_filters(ticker, debug=True):
                 potential_trades_tickers.append(ticker.ticker)
@@ -82,8 +77,7 @@ def weekly_rotation_sp500():
                                         columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC', ascending=False)
     else:
         potential_trades = 'Market is unfavorable. Close current positions and do not open new ones'
-
-
-    print(potential_trades)
+    print('Analysis of trading universe completed. Results below...')
+    print(potential_trades[:10])
     potential_trades.to_csv(f'WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
 

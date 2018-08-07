@@ -18,7 +18,6 @@ def roc(close, n_days=200, fillna=False ):
     return roc
 
 
-
 def rsi(close, n=14, fillna=False):
     """Relative Strength Index (RSI)
     Compares the magnitude of recent gains and losses over a specified time
@@ -117,6 +116,3 @@ def tsi(close, r=25, s=13, fillna=False):
         tsi = tsi.fillna(0)
     return pd.Series(tsi, name='tsi')
 
-
-# TODO:
-# Stochastic oscillator / Ultimate oscillator / Williams %R (%R)

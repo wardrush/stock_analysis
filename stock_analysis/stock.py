@@ -2,8 +2,9 @@ import pandas as pd
 import requests
 from datetime import datetime, timedelta
 from stock_analysis.retrieve_data import retrieve_single_data, clean_single_data
-from stock_analysis.technical_analysis.trend import sma
+from stock_analysis.technical_analysis import trend
 from stock_analysis.technical_analysis import momentum
+from stock_analysis.technical_analysis import volatility
 pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas functionality to datareader
 import pandas_datareader.data as web
 
@@ -100,7 +101,7 @@ class Stock:
         sp500 = Stock('SPY')
         sp500.rb_lookup()
         try:
-            sma_w_buffer = sma(sp500.close * (1 - buffer))
+            sma_w_buffer = trend.sma(sp500.close * (1 - buffer))
             if sp500.close.iloc[-1] < sma_w_buffer.iloc[-1]:
                 sp500_above_200_sma_w_buffer = False
             elif sp500.close.iloc[-1] > sma_w_buffer.iloc[-1]:
@@ -134,15 +135,15 @@ class Stock:
         return is_valid
 
 
-    def filter_rsi(self, n_days=3, **kwargs):
+    def filter_rsi(self, n_days=3, max_val=None, min_val=None):
         rsi = momentum.rsi(self.close, n_days).tail(1).iloc[-1]
-        if 'min_val' in kwargs:
-            if rsi >= kwargs['min_val']:
+        if min_val:
+            if rsi >= min_val:
                 is_valid = True
             else:
                 is_valid = False
-        elif 'max_val' in kwargs:
-            if rsi <= kwargs['max_val']:
+        elif max_val:
+            if rsi <= max_val:
                 is_valid = True
             else:
                 is_valid = False
@@ -150,11 +151,37 @@ class Stock:
             is_valid = False
         return is_valid
 
-    def filter_adx(self, n_days=7):
-        pass
+    def filter_adx(self, n_days=7, max_val=None, min_val=None):
+        adx = trend.adx(self.close, n_days).tail(1).iloc[-1]
+        if min_val:
+            if adx >= min_val:
+                is_valid = True
+            else:
+                is_valid = False
+        elif max_val:
+            if adx <= max_val:
+                is_valid = True
+            else:
+                is_valid = False
+        else:
+            is_valid = False
+        return is_valid
 
-    def filter_adr(self, n_days=10):
-        pass
+    def filter_adr(self, n_days=10, max_val=None, min_val=None):
+        adr = volatility.adr(self.close, n_days).tail(1).iloc[-1]
+        if min_val:
+            if adr >= min_val:
+                is_valid = True
+            else:
+                is_valid = False
+        elif max_val:
+            if adr <= max_val:
+                is_valid = True
+            else:
+                is_valid = False
+        else:
+            is_valid = False
+        return is_valid
 
     """
     Begin Entrance / Exit Strategy

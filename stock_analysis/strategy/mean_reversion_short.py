@@ -52,11 +52,21 @@ potential_trades_3DayRSI = []
 
 
 # Filters:
-def mean_reversion_short_filters(stock):
-    if stock.filter_price(min_price=10) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
-            stock.filter_issue_type(non_accepted_issue_types=['et']) & stock.filter_rsi(n_days=3, min_val=85) & \
-        stock.filter_adx(n_days=7, min_val=50)
-        return True
+def mean_reversion_short_filters(stock, debug=False):
+    if debug:
+        price_filter = stock.filter_price(min_price=10)
+        avg_vol_filter = stock.filter_avg_vol(n_days=50, min_volume=500000)
+        issue_type_filter = stock.filter_issue_type(non_accepted_issue_types=['et'])
+        rsi_filter = stock.filter_rsi(n_days=3, min_val=85)
+        adx_filter = stock.filter_adx(n_days=7, min_val=50)
+        if price_filter & avg_vol_filter & issue_type_filter & rsi_filter & adx_filter:
+            return True
+
+    else:
+        if stock.filter_price(min_price=10) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
+                stock.filter_issue_type(non_accepted_issue_types=['et']) & stock.filter_rsi(n_days=3, min_val=85) & \
+            stock.filter_adx(n_days=7, min_val=50)
+            return True
 
 
 for ticker in trading_universe:

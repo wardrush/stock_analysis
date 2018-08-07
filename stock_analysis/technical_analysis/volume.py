@@ -160,20 +160,3 @@ def volume_price_trend(close, volume, fillna=False):
         vpt = vpt.fillna(0)
     return pd.Series(vpt, name='vpt')
 
-
-# TODO
-
-def negative_volume_index():
-    """Negative Volume Index (NVI)
-    https://en.wikipedia.org/wiki/Negative_volume_index
-    """
-    # TODO
-    return
-
-
-def put_call_ratio():
-    """Put/Call ratio (PCR)
-    https://en.wikipedia.org/wiki/Put/call_ratio
-    """
-    # TODO
-    return

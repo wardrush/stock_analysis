@@ -1,6 +1,22 @@
 import pandas as pd
 
 
+def average_daily_range(high, low, n_days):
+    #TODO Test
+    """Average Daily Range (ADR)
+    The indicator of price volatility. The disadvantage of this indicator is that rapid shifts in one direction can
+    reduce apparent ADR because the high of one day can be lower than the high of the next day (after hours trading).
+    This situation would reduce apparent ADR but not true ADR
+
+    :param high: a pandas series of historical high values
+    :param low: a pandas series of historical low values
+    :param n_days: an int of how many days the ADR should be calculated for
+    :return adr: a pandas series of the ADR for moving n_day calculation
+    """
+    daily_range = high.subtract(low)
+    return daily_range.rolling(n_days).mean()
+
+
 def average_true_range(high, low, close, n=14, fillna=False):
     """Average True Range (ATR)
     The indicator provide an indication of the degree of price volatility.

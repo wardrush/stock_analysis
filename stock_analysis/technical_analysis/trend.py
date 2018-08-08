@@ -122,7 +122,8 @@ def ema_slow(close, n_slow=26, fillna=False):
     return pd.Series(emaslow, name='emaslow')
 
 
-def adx(high, low, close, n=14, fillna=False):
+def adx(high, low, close, n_days=14, fillna=False):
+    # TODO figure out how to fix this
     """Average Directional Movement Index (ADX)
     The Plus Directional Indicator (+DI) and Minus Directional Indicator (-DI)
     are derived from smoothed averages of these differences, and measure trend
@@ -145,8 +146,11 @@ def adx(high, low, close, n=14, fillna=False):
     """
     cs = close.shift(1)
 
-    tr = high.combine(cs, max) - low.combine(cs, min)
-    trs = tr.rolling(n).sum()
+    # tr = high.combine(cs, max) - low.combine(cs, min)
+    test = [float(value) for _, value in list(cs.iteritems())]
+    vals = high.combine(test, lambda x1, x2: x2 if x1 < x2 else x1)
+    tr = high.combine(list(cs.iteritems()), lambda x1, x2: x2 if x1 < x2 else x1) - low.combine(list(cs.iteritems()), lambda x1, x2: x1 if x1 < x2 else x2)
+    trs = tr.rolling(n_days).sum()
 
     up = high - high.shift(1)
     dn = low.shift(1) - low
@@ -154,11 +158,11 @@ def adx(high, low, close, n=14, fillna=False):
     pos = ((up > dn) & (up > 0)) * up
     neg = ((dn > up) & (dn > 0)) * dn
 
-    dip = 100 * pos.rolling(n).sum() / trs
-    din = 100 * neg.rolling(n).sum() / trs
+    dip = 100 * pos.rolling(n_days).sum() / trs
+    din = 100 * neg.rolling(n_days).sum() / trs
 
     dx = 100 * np.abs((dip - din)/(dip + din))
-    adx = dx.ewm(n).mean()
+    adx = dx.ewm(n_days).mean()
 
     if fillna:
         adx = adx.fillna(40)

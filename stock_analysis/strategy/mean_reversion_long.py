@@ -49,8 +49,7 @@ from stock_analysis.technical_analysis import trend
 
 def strategy_mean_reversion_long():
     # Trading universe is AMEX, NYSE, NASDAQ
-    trading_universe = amex.append([nyse, nasdaq]).sort_values()
-
+    trading_universe = amex.append([nyse, nasdaq]).iloc[:, 0].sort_values()
     potential_trades_tickers = []
     potential_trades_3DayRSI = []
 
@@ -66,14 +65,15 @@ def strategy_mean_reversion_long():
             if price_filter & avg_vol_filter & issue_type_filter & rsi_filter & adx_filter:
                 return True
         if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
-                stock.filter_issue_type('cs') & stock.filter_rsi(n_days=3, max_val=30) & stock.filter_n_day_adx(n_days=7, min_val=45)
+                stock.filter_issue_type(accepted_issue_types=['cs']) & stock.filter_rsi(n_days=3, max_val=30) & \
+                stock.filter_adx(n_days=7, min_val=45):
             return True
 
     with tqdm.tqdm(total=len(trading_universe)) as prog_bar:
 
         for ticker in trading_universe:
             ticker = Stock(ticker)
-            ticker.morningstar_lookup()
+            ticker.rb_lookup()
             prog_bar.update()
             if mean_reversion_long_filters(ticker):
                 potential_trades_tickers.append(ticker.ticker)

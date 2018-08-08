@@ -6,11 +6,10 @@ from stock_analysis.technical_analysis import trend
 from stock_analysis.technical_analysis import momentum
 from stock_analysis.technical_analysis import volatility
 
+
 class Stock:
-    """The main class for passing information through this package-holds various relevant data to stock analysis
-
-
-
+    """
+    The main class for passing information through this package-holds various relevant data to stock analysis
     """
     def __init__(self, ticker):
         self.ticker = ticker
@@ -23,8 +22,10 @@ class Stock:
             f'https://api.iextrading.com/1.0/stock/{self.ticker}/company').json()['issueType']
 
     def rb_lookup(self):
-        """"""
-
+        """
+        Robinhood API lookup used to update object attributes.
+        Uses functions retrieve_single_data, clean_single_data from retrieve_data
+        """
         temp = clean_single_data(retrieve_single_data(self.ticker))
         self.close = pd.to_numeric(temp.loc[:, "Close"])
         self.high = temp.loc[:, "High"]
@@ -35,7 +36,9 @@ class Stock:
         self.lookup = 'robinhood_api'
 
     def morningstar_lookup(self, days_ago=300):
-        """IMMEDIATELY DEPRECATED An OHLC lookup for n days_ago using morningstar's API
+        """
+        IMMEDIATELY DEPRECATED
+        An OHLC lookup for n days_ago using morningstar's API
         Deprecation due to reliance on pandas_datareader
         #TODO put together a new version of this function in the same manner as the robinhood function
 
@@ -77,11 +80,9 @@ class Stock:
             is_valid = False
         return is_valid
 
-
     def filter_avg_vol(self, n_days=50, min_volume=500000):
         is_valid = self.volume.tail(n_days).mean() > min_volume
         return is_valid
-
 
     def filter_issue_type(self, accepted_issue_types=None, non_accepted_issue_types=None):
         is_valid = False
@@ -92,7 +93,6 @@ class Stock:
             if self.issueType in non_accepted_issue_types:
                 is_valid = False
         return is_valid
-
 
     def filter_rsi(self, n_days=3, max_val=None, min_val=None):
         rsi = momentum.rsi(self.close, n_days).tail(1).iloc[-1]
@@ -111,7 +111,7 @@ class Stock:
         return is_valid
 
     def filter_adx(self, n_days=7, max_val=None, min_val=None):
-        adx = trend.adx(self.close, n_days).tail(1).iloc[-1]
+        adx = trend.adx(high=self.high, low=self.low, close=self.close, n_days=n_days).tail(1).iloc[-1]
         if min_val:
             if adx >= min_val:
                 is_valid = True

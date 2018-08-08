@@ -2,10 +2,10 @@ import pandas as pd
 
 
 def average_daily_range(high, low, n_days):
-    #TODO Test
-    """Average Daily Range (ADR)
+    """
+    Average Daily Range (ADR)\n
     The indicator of price volatility. The disadvantage of this indicator is that rapid shifts in one direction can
-    reduce apparent ADR because the high of one day can be lower than the high of the next day (after hours trading).
+    reduce apparent ADR (i.e. the high of one day can be lower than the high of the next day).
     This situation would reduce apparent ADR but not true ADR
 
     :param high: a pandas series of historical high values
@@ -18,7 +18,8 @@ def average_daily_range(high, low, n_days):
 
 
 def average_true_range(high, low, close, n=14, fillna=False):
-    """Average True Range (ATR)
+    """
+    Average True Range (ATR)\n
     The indicator provide an indication of the degree of price volatility.
     Strong moves, in either direction, are often accompanied by large ranges,
     or large True Ranges.
@@ -40,7 +41,8 @@ def average_true_range(high, low, close, n=14, fillna=False):
 
 
 def bollinger_mavg(close, n=20, fillna=False):
-    """Bollinger Bands (BB)
+    """
+    Bollinger Bands (BB)\n
     N-period simple moving average (MA).
     https://en.wikipedia.org/wiki/Bollinger_Bands
     Args:
@@ -56,7 +58,8 @@ def bollinger_mavg(close, n=20, fillna=False):
 
 
 def bollinger_hband(close, n=20, ndev=2, fillna=False):
-    """Bollinger Bands (BB)
+    """
+    Bollinger Bands (BB)\n
     Upper band at K times an N-period standard deviation above the moving
     average (MA + Kdeviation).
     https://en.wikipedia.org/wiki/Bollinger_Bands
@@ -76,7 +79,8 @@ def bollinger_hband(close, n=20, ndev=2, fillna=False):
 
 
 def bollinger_lband(close, n=20, ndev=2, fillna=False):
-    """Bollinger Bands (BB)
+    """
+    Bollinger Bands (BB)\n
     Lower band at K times an N-period standard deviation below the moving
     average (MA − Kdeviation).
     https://en.wikipedia.org/wiki/Bollinger_Bands
@@ -96,7 +100,8 @@ def bollinger_lband(close, n=20, ndev=2, fillna=False):
 
 
 def bollinger_hband_indicator(close, n=20, ndev=2, fillna=False):
-    """Bollinger High Band Indicator
+    """
+    Bollinger High Band Indicator\n
     Returns 1, if close is higher than bollinger high band. Else, return 0.
     https://en.wikipedia.org/wiki/Bollinger_Bands
     Args:
@@ -119,7 +124,8 @@ def bollinger_hband_indicator(close, n=20, ndev=2, fillna=False):
 
 
 def bollinger_lband_indicator(close, n=20, ndev=2, fillna=False):
-    """Bollinger Low Band Indicator
+    """
+    Bollinger Low Band Indicator\n
     Returns 1, if close is lower than bollinger low band. Else, return 0.
     https://en.wikipedia.org/wiki/Bollinger_Bands
     Args:
@@ -142,7 +148,8 @@ def bollinger_lband_indicator(close, n=20, ndev=2, fillna=False):
 
 
 def keltner_channel_central(high, low, close, n=10, fillna=False):
-    """Keltner channel (KC)
+    """
+    Keltner channel (KC)\n
     Showing a simple moving average line (central) of typical price.
     https://en.wikipedia.org/wiki/Keltner_channel
     Args:
@@ -161,7 +168,8 @@ def keltner_channel_central(high, low, close, n=10, fillna=False):
 
 
 def keltner_channel_hband(high, low, close, n=10, fillna=False):
-    """Keltner channel (KC)
+    """
+    Keltner channel (KC)\n
     Showing a simple moving average line (high) of typical price.
     https://en.wikipedia.org/wiki/Keltner_channel
     Args:
@@ -180,7 +188,8 @@ def keltner_channel_hband(high, low, close, n=10, fillna=False):
 
 
 def keltner_channel_lband(high, low, close, n=10, fillna=False):
-    """Keltner channel (KC)
+    """
+    Keltner channel (KC)\n
     Showing a simple moving average line (low) of typical price.
     https://en.wikipedia.org/wiki/Keltner_channel
     Args:
@@ -199,7 +208,8 @@ def keltner_channel_lband(high, low, close, n=10, fillna=False):
 
 
 def keltner_channel_hband_indicator(high, low, close, n=10, fillna=False):
-    """Keltner Channel High Band Indicator (KC)
+    """
+    Keltner Channel High Band Indicator (KC)\n
     Returns 1, if close is higher than keltner high band channel. Else,
     return 0.
     https://en.wikipedia.org/wiki/Keltner_channel
@@ -222,7 +232,8 @@ def keltner_channel_hband_indicator(high, low, close, n=10, fillna=False):
 
 
 def keltner_channel_lband_indicator(high, low, close, n=10, fillna=False):
-    """Keltner Channel Low Band Indicator (KC)
+    """
+    Keltner Channel Low Band Indicator (KC)\n
     Returns 1, if close is lower than keltner low band channel. Else, return 0.
     https://en.wikipedia.org/wiki/Keltner_channel
     Args:
@@ -244,7 +255,8 @@ def keltner_channel_lband_indicator(high, low, close, n=10, fillna=False):
 
 
 def donchian_channel_hband(close, n=20, fillna=False):
-    """Donchian channel (DC)
+    """
+    Donchian channel (DC)\n
     The upper band marks the highest price of an issue for n periods.
     https://www.investopedia.com/terms/d/donchianchannels.asp
     Args:
@@ -260,7 +272,8 @@ def donchian_channel_hband(close, n=20, fillna=False):
 
 
 def donchian_channel_lband(close, n=20, fillna=False):
-    """Donchian channel (DC)
+    """
+    Donchian channel (DC)\n
     The lower band marks the lowest price for n periods.
     https://www.investopedia.com/terms/d/donchianchannels.asp
     Args:
@@ -276,7 +289,8 @@ def donchian_channel_lband(close, n=20, fillna=False):
 
 
 def donchian_channel_hband_indicator(close, n=20, fillna=False):
-    """Donchian High Band Indicator
+    """
+    Donchian High Band Indicator\n
     Returns 1, if close is higher than donchian high band channel. Else,
     return 0.
     https://www.investopedia.com/terms/d/donchianchannels.asp
@@ -297,7 +311,8 @@ def donchian_channel_hband_indicator(close, n=20, fillna=False):
 
 
 def donchian_channel_lband_indicator(close, n=20, fillna=False):
-    """Donchian Low Band Indicator
+    """
+    Donchian Low Band Indicator\n
     Returns 1, if close is lower than donchian low band channel. Else, return 0.
     https://www.investopedia.com/terms/d/donchianchannels.asp
     Args:

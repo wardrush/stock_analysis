@@ -36,7 +36,7 @@ import pandas as pd
 # Begin package specific imports
 from stock_analysis.stock import Stock
 from stock_analysis.technical_analysis import momentum
-from stock_analysis.exchanges import sp500_cleaned, big50
+from stock_analysis.exchanges import sp500, sp500_cleaned, big50
 
 
 def strategy_weekly_rotation_sp500():
@@ -55,7 +55,7 @@ def strategy_weekly_rotation_sp500():
                 return True
 
     print('Beginning analysis for Weekly Rotation Strategy')
-    trading_universe = big50.iloc[:, 0].sort_values()
+    trading_universe = sp500.iloc[:, 0].sort_values()
     potential_trades_tickers = []
     potential_trades_200dayROC = []
     sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
@@ -83,4 +83,4 @@ def strategy_weekly_rotation_sp500():
         print(potential_trades[:10])
         print(f'Printing to csv with filename: WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
         potential_trades.to_csv(f'WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
-
+    return potential_trades

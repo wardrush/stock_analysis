@@ -39,33 +39,43 @@ Exit:
 - When position has made >= 3% profit, close on next day open
 - When 4 days have passed without either of above, exit market on close **Maybe change to open**
 """
-from stock_analysis.stock import Stock
-from stock_analysis.technical_analysis import trend
+
 import pandas as pd
+# Begin package specific imports
+from stock_analysis.stock import Stock
+from stock_analysis.exchanges import amex, nyse, nasdaq
+from stock_analysis.technical_analysis import trend
 
-# Trading universe is AMEX, NYSE, NASDAQ
-amex = pd.read_csv('amex.csv').iloc[:,0]
-nyse = pd.read_csv('nyse.csv').iloc[:,0]
-nasdaq = pd.read_csv('nasdaq.csv').iloc[:,0]
-trading_universe = amex.append([nyse, nasdaq]).sort_values()
+def strategy_mean_reversion_long():
+    # Trading universe is AMEX, NYSE, NASDAQ
+    trading_universe = amex.append([nyse, nasdaq]).sort_values()
 
-potential_trades_tickers = []
-potential_trades_3DayRSI = []
-
-
-# Filters
-def mean_reversion_long_filters(stock):
-    if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
-            stock.filter_issue_type('cs') & stock.filter_rsi(n_days=3, max_val=30) & stock.filter_n_day_adx(7)
-        return True
+    potential_trades_tickers = []
+    potential_trades_3DayRSI = []
 
 
-for ticker in trading_universe:
-    ticker = Stock(ticker)
-    ticker.morningstar_lookup()
-    if mean_reversion_long_filters(ticker):
-        potential_trades_tickers.append(ticker.ticker)
-        potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
-temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
-potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_200dayROC,
-                                                                                   ascending=False)
+    # Filters
+    def mean_reversion_long_filters(stock, debug=False):
+        if debug:
+            price_filter = stock.filter_price(min_price=1)
+            avg_vol_filter = stock.filter_avg_vol(n_days=50, min_volume=500000)
+            issue_type_filter = stock.filter_issue_type(non_accepted_issue_types=['et'])
+            rsi_filter = stock.filter_rsi(n_days=3, max_val=30)
+            adx_filter = stock.filter_adx(n_days=7, min_val=45)
+            if price_filter & avg_vol_filter & issue_type_filter & rsi_filter & adx_filter:
+                return True
+        if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
+                stock.filter_issue_type('cs') & stock.filter_rsi(n_days=3, max_val=30) & stock.filter_n_day_adx(n_days=7, min_val=45)
+            return True
+
+
+    for ticker in trading_universe:
+        ticker = Stock(ticker)
+        ticker.morningstar_lookup()
+        if mean_reversion_long_filters(ticker):
+            potential_trades_tickers.append(ticker.ticker)
+            potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
+    temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
+    potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_200dayROC,
+                                                                                       ascending=False)
+

@@ -32,14 +32,13 @@ Exit:
 """
 import datetime
 import pandas as pd
-import os
-
+# Begin package specific imports
 from stock_analysis.stock import Stock
 from stock_analysis.technical_analysis import momentum
 from stock_analysis.exchanges import sp500_cleaned
 
 
-def weekly_rotation_sp500():
+def strategy_weekly_rotation_sp500():
 
     def weekly_rotation_filters(stock, debug=False):
         if debug:
@@ -49,7 +48,6 @@ def weekly_rotation_sp500():
             rsi_filter = stock.filter_rsi(n_days=3, max_val=50)
             if price_filter & avg_vol_filter & issue_type_filter & rsi_filter:
                 return True
-
         else:
             if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=20, min_volume=1000000) & \
                     stock.filter_issue_type(accepted_issue_types=['cs']) & stock.filter_rsi(n_days=3, max_val=50):
@@ -66,7 +64,7 @@ def weekly_rotation_sp500():
         for ticker in trading_universe:
             ticker = Stock(ticker)
             ticker.get_issueType()
-            ticker.rb_api_lookup()
+            ticker.rb_lookup()
             if weekly_rotation_filters(ticker, debug=True):
                 potential_trades_tickers.append(ticker.ticker)
                 potential_trades_200dayROC.append(momentum.roc(ticker.close).tail(1).iloc[-1])
@@ -74,10 +72,12 @@ def weekly_rotation_sp500():
                   f'{"Yes" if weekly_rotation_filters(ticker) else "No"}')
         temp = list(zip(potential_trades_tickers, potential_trades_200dayROC))
         potential_trades = pd.DataFrame(temp,
-                                        columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC', ascending=False)
+                                        columns=['Symbol', '200 Day ROC']).sort_values(by='200 Day ROC',
+                                                                                       ascending=False)
     else:
         potential_trades = 'Market is unfavorable. Close current positions and do not open new ones'
     print('Analysis of trading universe completed. Results below...')
     print(potential_trades[:10])
+    print(f'Printing to csv with filename: WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
     potential_trades.to_csv(f'WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
 

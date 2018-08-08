@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 def portfolio_management():
-    # Create a user-specific portfolio file
+    # Create a user-specific portfolio file if it does not exist
     if not os.path.exists('portfolio'):
         os.mkdir('portfolio')
     if os.path.isfile(os.path.join('portfolio', 'Trades.csv')):

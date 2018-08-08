@@ -5,9 +5,6 @@ from stock_analysis.retrieve_data import retrieve_single_data, clean_single_data
 from stock_analysis.technical_analysis import trend
 from stock_analysis.technical_analysis import momentum
 from stock_analysis.technical_analysis import volatility
-pd.core.common.is_list_like = pd.api.types.is_list_like  # Add newer pandas functionality to datareader
-import pandas_datareader.data as web
-
 
 class Stock:
     """The main class for passing information through this package-holds various relevant data to stock analysis
@@ -25,7 +22,9 @@ class Stock:
         self.issueType = requests.get(
             f'https://api.iextrading.com/1.0/stock/{self.ticker}/company').json()['issueType']
 
-    def rb_api_lookup(self):
+    def rb_lookup(self):
+        """"""
+
         temp = clean_single_data(retrieve_single_data(self.ticker))
         self.close = pd.to_numeric(temp.loc[:, "Close"])
         self.high = temp.loc[:, "High"]
@@ -35,55 +34,14 @@ class Stock:
         self.dates = temp.loc[:, "Date"]
         self.lookup = 'robinhood_api'
 
-    def rb_lookup(self):
-        """
-        Return 1 year of OHLC and Volume data from robinhood
-        """
-        try:
-            temp = web.DataReader(self.ticker, 'robinhood')
-            temp = temp.reset_index()  # Remove multiindexing
-            temp = temp.drop(columns=["interpolated", "session"])
-            temp.rename(
-                columns={
-                    "symbol": "Symbol",
-                    "begins_at": "Date",
-                    "close_price": "Close",
-                    "high_price": "High",
-                    "low_price": "Low",
-                    "open_price": "Open",
-                    "volume": "Volume"
-                }, inplace=True)
-            self.close = pd.to_numeric(temp.loc[:, "Close"])
-            self.high = temp.loc[:, "High"]
-            self.low = temp.loc[:, "Low"]
-            self.open = temp.loc[:, "Open"]
-            self.volume = temp.loc[:, "Volume"]
-            self.dates = temp.loc[:, "Date"]
-            self.lookup = 'robinhood'
-        except AttributeError as e:
-            raise AttributeError('Only string lookups supported')
+   def morningstar_lookup(self, days_ago=300):
+    """IMMEDIATELY DEPRECATED An OHLC lookup for n days_ago using morningstar's API
+    Deprecation due to reliance on pandas_datareader
+    #TODO put together a new version of this function in the same manner as the robinhood function
 
-    def morningstar_lookup(self, days_ago=300):
-        """
-        OHLC and Volume data from Morningstar.
-        Start and end dates must be specified
-        No apparent limit to how far back quotes go
-
-        # BUG figure out why there is not data for every day. Use IEX?
-        """
-        try:
-            startdate = datetime.today() - timedelta(days=days_ago)
-            temp = web.DataReader(self.ticker, 'morningstar', start=startdate, end=datetime.today())
-            temp = temp.reset_index()  # Remove multiindexing
-            self.close = pd.to_numeric(temp.loc[:, "Close"])
-            self.high = temp.loc[:, "High"]
-            self.low = temp.loc[:, "Low"]
-            self.open = temp.loc[:, "Open"]
-            self.volume = temp.loc[:, "Volume"]
-            self.dates = temp.loc[:, "Date"]
-            self.lookup = 'morningstar'
-        except AttributeError as e:
-            raise AttributeError('Only string lookups supported')
+    :param days_ago:
+    :return:
+    """
 
     """
     Begin filtering functions

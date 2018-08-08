@@ -83,12 +83,7 @@ class TechnicalAnalysisTest(unittest.TestCase):
         sma_series = trend.sma(self.aapl.close)
         print(sma_series)
 
-    def test_sma_50_days(self):
-        pass
 
-    # @expectedFailure
-    def test_sma_nonint_days(self):
-        pass
 
     # Test MACD, MACD_signal, MACD_difference
     # Test EMA (fast and slow)

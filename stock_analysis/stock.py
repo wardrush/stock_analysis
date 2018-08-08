@@ -34,14 +34,15 @@ class Stock:
         self.dates = temp.loc[:, "Date"]
         self.lookup = 'robinhood_api'
 
-   def morningstar_lookup(self, days_ago=300):
-    """IMMEDIATELY DEPRECATED An OHLC lookup for n days_ago using morningstar's API
-    Deprecation due to reliance on pandas_datareader
-    #TODO put together a new version of this function in the same manner as the robinhood function
+    def morningstar_lookup(self, days_ago=300):
+        """IMMEDIATELY DEPRECATED An OHLC lookup for n days_ago using morningstar's API
+        Deprecation due to reliance on pandas_datareader
+        #TODO put together a new version of this function in the same manner as the robinhood function
 
-    :param days_ago:
-    :return:
-    """
+        :param days_ago:
+        :return:
+        """
+        pass
 
     """
     Begin filtering functions

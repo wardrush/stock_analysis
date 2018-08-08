@@ -38,6 +38,7 @@ Exit:
 - When 2 days have passed without either of above, exit market on close **Maybe change to open**
 """
 import pandas as pd
+import tqdm
 # Begin package specific imports
 from stock_analysis.exchanges import amex, nyse, nasdaq
 from stock_analysis.stock import Stock
@@ -67,18 +68,22 @@ def strategy_mean_reversion_short():
     trading_universe = amex.append([nyse, nasdaq]).sort_values()
     potential_trades_tickers = []
     potential_trades_3DayRSI = []
+    # Progress bar
+    with tqdm.tqdm(total=len(trading_universe)) as prog_bar:
 
 
-    for ticker in trading_universe:
-        ticker = Stock(ticker)
-        ticker.morningstar_lookup()
-        if mean_reversion_short_filters(ticker):
-            potential_trades_tickers.append(ticker.ticker)
-            potential_trades_3DayRSI.append(momentum.roc(ticker.close).tail(1).iloc[-1])
-    temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
-    potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_3DayRSI)
+        for ticker in trading_universe:
+            ticker = Stock(ticker)
+            ticker.morningstar_lookup()
+            prog_bar.update()
+            if mean_reversion_short_filters(ticker):
+                potential_trades_tickers.append(ticker.ticker)
+                potential_trades_3DayRSI.append(momentum.roc(ticker.close).tail(1).iloc[-1])
+        temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
+        potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']
+                                        ).sort_values(by=potential_trades_3DayRSI).reset_index(drop=True)
 
-    print('Analysis of trading universe completed. Results below...')
-    print(potential_trades[:10])
-    print(f'Printing to csv with filename: Mean Reversion Short week of {datetime.date.isoformat(datetime.date.today())}')
-    potential_trades.to_csv(f'Mean Reversion Short week of {datetime.date.isoformat(datetime.date.today())}')
+        print('Analysis of trading universe completed. Results below...')
+        print(potential_trades[:10])
+        print(f'Printing to csv: Mean Reversion Short week of {datetime.date.isoformat(datetime.date.today())}')
+        potential_trades.to_csv(f'Mean Reversion Short week of {datetime.date.isoformat(datetime.date.today())}')

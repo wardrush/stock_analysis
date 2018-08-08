@@ -41,6 +41,7 @@ Exit:
 """
 
 import pandas as pd
+import tqdm
 # Begin package specific imports
 from stock_analysis.stock import Stock
 from stock_analysis.exchanges import amex, nyse, nasdaq
@@ -68,14 +69,16 @@ def strategy_mean_reversion_long():
                 stock.filter_issue_type('cs') & stock.filter_rsi(n_days=3, max_val=30) & stock.filter_n_day_adx(n_days=7, min_val=45)
             return True
 
+    with tqdm.tqdm(total=len(trading_universe)) as prog_bar:
 
-    for ticker in trading_universe:
-        ticker = Stock(ticker)
-        ticker.morningstar_lookup()
-        if mean_reversion_long_filters(ticker):
-            potential_trades_tickers.append(ticker.ticker)
-            potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
-    temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
-    potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_200dayROC,
-                                                                                       ascending=False)
+        for ticker in trading_universe:
+            ticker = Stock(ticker)
+            ticker.morningstar_lookup()
+            prog_bar.update()
+            if mean_reversion_long_filters(ticker):
+                potential_trades_tickers.append(ticker.ticker)
+                potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
+        temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
+        potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']
+                                        ).sort_values(by=potential_trades_3DayRSI, ascending=False).reset_index(drop=True)
 

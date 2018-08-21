@@ -6,23 +6,20 @@ os.chdir(dirname)
 
 # Manually set logging
 log = True
-if log == True:
+if log:
     import logging
-    # Create the Logger
+    # Create new empty file
+    if os.path.isfile('python_logging.log'):
+        with open('python_logging.log', 'w'):
+            pass
+
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
-
-    # Create the Handler for logging data to a file
     logger_handler = logging.FileHandler('python_logging.log')
     logger_handler.setLevel(logging.DEBUG)
-
     # Create a Formatter for formatting the log messages
     logger_formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-
-    # Add the Formatter to the Handler
     logger_handler.setFormatter(logger_formatter)
-
-    # Add the Handler to the Logger
     logger.addHandler(logger_handler)
 
 __version__ = 0.0  # Pre-release

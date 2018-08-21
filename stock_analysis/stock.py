@@ -1,6 +1,5 @@
 import pandas as pd
 import requests
-from datetime import datetime, timedelta
 from stock_analysis.retrieve_data import retrieve_single_data, clean_single_data
 from stock_analysis.technical_analysis import trend
 from stock_analysis.technical_analysis import momentum
@@ -10,6 +9,26 @@ from stock_analysis.technical_analysis import volatility
 class Stock:
     """
     The main class for passing information through this package-holds various relevant data to stock analysis
+    Contains general functions:
+        - get_issueType
+            - Args: Self
+            - Returns: string 2 letter abbreviation of stock issue type
+        - rb_lookup
+            - Args: Self
+            - Returns: multiple pandas.Series for OHLCV data
+
+    Filter functions:
+        - 200-day SP500 SMA
+        - Minimum Price
+        - Average n-day Volume
+        - Issue Type
+        - RSI
+        - ADX
+        - ADR
+    Entrance / Exit functions:
+        - 2.5x ATR
+        - n-% Profit
+        - n-days Inactive
     """
     def __init__(self, ticker):
         self.ticker = ticker
@@ -26,7 +45,6 @@ class Stock:
         Robinhood API lookup used to update object attributes.
         Uses functions retrieve_single_data, clean_single_data from retrieve_data
         """
-
         temp = clean_single_data(retrieve_single_data(self.ticker))
         self.close = pd.to_numeric(temp.loc[:, "Close"])
         self.high = pd.to_numeric(temp.loc[:, "High"])
@@ -35,19 +53,6 @@ class Stock:
         self.volume = pd.to_numeric(temp.loc[:, "Volume"])
         self.dates = temp.loc[:, "Date"]
         self.lookup = 'robinhood_api'
-
-
-    def morningstar_lookup(self, days_ago=300):
-        """
-        IMMEDIATELY DEPRECATED
-        An OHLC lookup for n days_ago using morningstar's API
-        Deprecation due to reliance on pandas_datareader
-        #TODO put together a new version of this function in the same manner as the robinhood function
-
-        :param days_ago:
-        :return:
-        """
-        pass
 
     """
     Begin filtering functions

@@ -41,20 +41,31 @@ Exit:
 """
 import pandas as pd
 import tqdm
+import logging
 
 # Begin package specific imports
 from stock_analysis.stock import Stock
-from stock_analysis.exchanges import amex, nyse, nasdaq
-from stock_analysis.technical_analysis import trend
+from stock_analysis.exchanges import mean_reversion
+from stock_analysis.technical_analysis import momentum
 
 
-def strategy_mean_reversion_long():
-    # Trading universe is AMEX, NYSE, NASDAQ
-    trading_universe = amex.append([nyse, nasdaq]).iloc[:, 0].sort_values()
-    potential_trades_tickers = []
-    potential_trades_3DayRSI = []
+class MeanReversionLong:
 
-    # Filters
+    def __init__(self, debug=True):
+        print('Beginning analysis for Mean Reversion Long Strategy')
+        self.debug = debug
+        self.logger = logging.getLogger(__name__)
+        self.logger.info('Strategy: Mean Reversion Long')
+        # Trading universe is AMEX, NYSE, and NASDAQ
+        self.trading_universe = mean_reversion.iloc[:, 0].sort_values()
+        self.potential_trades_tickers = []
+        self.potential_trades_3DayRSI = []
+        if self.debug == True:
+            test_tick = input('If you would like to override the trading universe with a single ticker, please enter it... ')
+            if test_tick.upper():
+                self.trading_universe = [test_tick.upper()] #TODO fix
+
+    @staticmethod
     def mean_reversion_long_filters(stock, debug=False):
             if debug:
                 price_filter = stock.filter_price(min_price=1)
@@ -69,21 +80,30 @@ def strategy_mean_reversion_long():
                     stock.filter_adx(n_days=7, min_val=45):
                 return True
 
-    with tqdm.tqdm(total=len(trading_universe)) as prog_bar:
-        for ticker in trading_universe:
-            try:
-                ticker = Stock(ticker)
-                ticker.rb_lookup()
-                prog_bar.update()
-                if mean_reversion_long_filters(ticker):
-                    potential_trades_tickers.append(ticker.ticker)
-                    potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
-            except AttributeError:
-                log
+    def __call__(self):
+        with tqdm.tqdm(total=len(self.trading_universe)) as prog_bar:
+                for ticker in self.trading_universe:
+                    try:
+                        self.logger.debug(f'Checking stock: {ticker}')
+                        ticker = Stock(ticker)
+                        ticker.rb_lookup()
+                        ticker.get_issueType()
+                        prog_bar.update()
+                        if self.mean_reversion_long_filters(ticker, debug=self.debug):
+                            self.potential_trades_tickers.append(ticker.ticker)
+                            self.potential_trades_3DayRSI.append(momentum.roc(ticker.close).tail(1).iloc[-1])
+                            self.logger.info(f'Stock {ticker.ticker} passed tests')
+                    except AttributeError:
+                        self.logger.warning(f'Stock {ticker.ticker} failed during lookup')
 
+        temp = list(zip(self.potential_trades_tickers, self.potential_trades_3DayRSI))
+        potential_trades = pd.DataFrame(temp, columns=[
+            'Symbol', '3 Day RSI']).sort_values(by=self.potential_trades_3DayRSI,
+                                                ascending=False).reset_index(drop=True)
 
-        temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
-        potential_trades = pd.DataFrame(temp,
-                                        columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_3DayRSI,
-                                                                                ascending=False).reset_index(drop=True)
-
+        # Visual non-logging
+        print('\nAnalysis of trading universe completed. Results below...\n')
+        print(potential_trades[:10])
+        print(f'Printing to csv with filename: MeanRevLong week of {datetime.date.isoformat(datetime.date.today())}')
+        potential_trades.to_csv(f'MeanRevLong week of {datetime.date.isoformat(datetime.date.today())}')
+        return potential_trades

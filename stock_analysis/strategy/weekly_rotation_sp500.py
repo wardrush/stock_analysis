@@ -79,7 +79,7 @@ def strategy_weekly_rotation_sp500():
                                             ).sort_values(by='200 Day ROC',ascending=False).reset_index(drop=True)
         else:
             potential_trades = 'Market is unfavorable. Close current positions and do not open new ones'
-        print('Analysis of trading universe completed. Results below...')
+        print('\nAnalysis of trading universe completed. Results below...\n')
         print(potential_trades[:10])
         print(f'Printing to csv with filename: WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')
         potential_trades.to_csv(f'WeeklyRotation week of {datetime.date.isoformat(datetime.date.today())}')

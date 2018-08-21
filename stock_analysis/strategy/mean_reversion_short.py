@@ -61,7 +61,7 @@ def strategy_mean_reversion_short():
         else:
             if stock.filter_price(min_price=10) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
                     stock.filter_issue_type(non_accepted_issue_types=['et']) & stock.filter_rsi(n_days=3, min_val=85) & \
-                stock.filter_adx(n_days=7, min_val=50)
+                stock.filter_adx(n_days=7, min_val=50):
                 return True
             
     print('Beginning Mean Reversion Short strategy')

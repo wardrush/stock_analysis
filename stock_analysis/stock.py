@@ -26,14 +26,16 @@ class Stock:
         Robinhood API lookup used to update object attributes.
         Uses functions retrieve_single_data, clean_single_data from retrieve_data
         """
+
         temp = clean_single_data(retrieve_single_data(self.ticker))
         self.close = pd.to_numeric(temp.loc[:, "Close"])
-        self.high = temp.loc[:, "High"]
-        self.low = temp.loc[:, "Low"]
-        self.open = temp.loc[:, "Open"]
-        self.volume = temp.loc[:, "Volume"]
+        self.high = pd.to_numeric(temp.loc[:, "High"])
+        self.low = pd.to_numeric(temp.loc[:, "Low"])
+        self.open = pd.to_numeric(temp.loc[:, "Open"])
+        self.volume = pd.to_numeric(temp.loc[:, "Volume"])
         self.dates = temp.loc[:, "Date"]
         self.lookup = 'robinhood_api'
+
 
     def morningstar_lookup(self, days_ago=300):
         """

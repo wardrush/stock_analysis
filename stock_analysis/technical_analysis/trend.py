@@ -122,8 +122,7 @@ def ema_slow(close, n_slow=26, fillna=False):
     return pd.Series(emaslow, name='emaslow')
 
 
-def adx(high, low, close, n_days=14, fillna=False):
-    # TODO figure out how to fix this
+def adx(high, low, close, n_days=14):
     """Average Directional Movement Index (ADX)
     The Plus Directional Indicator (+DI) and Minus Directional Indicator (-DI)
     are derived from smoothed averages of these differences, and measure trend
@@ -140,33 +139,18 @@ def adx(high, low, close, n_days=14, fillna=False):
         low(pandas.Series): dataset 'Low' column.
         close(pandas.Series): dataset 'Close' column.
         n(int): n period.
-        fillna(bool): if True, fill nan values.
     Returns:
-        pandas.Series: New feature generated.
+        pandas.Series: ADX expressed as a percentage (1-100)
     """
-    cs = close.shift(1)
 
-    # tr = high.combine(cs, max) - low.combine(cs, min)
-    test = [float(value) for _, value in list(cs.iteritems())]
-    vals = high.combine(test, lambda x1, x2: x2 if x1 < x2 else x1)
-    tr = high.combine(list(cs.iteritems()), lambda x1, x2: x2 if x1 < x2 else x1) - low.combine(list(cs.iteritems()), lambda x1, x2: x1 if x1 < x2 else x2)
-    trs = tr.rolling(n_days).sum()
+    plus_direction_indicator = adx_pos(high=high, low=low, close=close, n=n_days)
+    minus_direction = adx_neg(high=high, low=low, close=close, n=n_days)
 
-    up = high - high.shift(1)
-    dn = low.shift(1) - low
-
-    pos = ((up > dn) & (up > 0)) * up
-    neg = ((dn > up) & (dn > 0)) * dn
-
-    dip = 100 * pos.rolling(n_days).sum() / trs
-    din = 100 * neg.rolling(n_days).sum() / trs
-
-    dx = 100 * np.abs((dip - din)/(dip + din))
-    adx = dx.ewm(n_days).mean()
-
-    if fillna:
-        adx = adx.fillna(40)
+    # DX = directional movement index
+    dx = abs(plus_direction_indicator - minus_direction) / (plus_direction_indicator + minus_direction)
+    adx = dx.rolling(n_days).mean() * 100 # Express as a percentage
     return pd.Series(adx, name='adx')
+
 
 
 def adx_pos(high, low, close, n=14, fillna=False):

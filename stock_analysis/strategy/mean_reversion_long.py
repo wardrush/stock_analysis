@@ -39,13 +39,14 @@ Exit:
 - When position has made >= 3% profit, close on next day open
 - When 4 days have passed without either of above, exit market on close **Maybe change to open**
 """
-
 import pandas as pd
 import tqdm
+
 # Begin package specific imports
 from stock_analysis.stock import Stock
 from stock_analysis.exchanges import amex, nyse, nasdaq
 from stock_analysis.technical_analysis import trend
+
 
 def strategy_mean_reversion_long():
     # Trading universe is AMEX, NYSE, NASDAQ
@@ -53,32 +54,36 @@ def strategy_mean_reversion_long():
     potential_trades_tickers = []
     potential_trades_3DayRSI = []
 
-
     # Filters
     def mean_reversion_long_filters(stock, debug=False):
-        if debug:
-            price_filter = stock.filter_price(min_price=1)
-            avg_vol_filter = stock.filter_avg_vol(n_days=50, min_volume=500000)
-            issue_type_filter = stock.filter_issue_type(non_accepted_issue_types=['et'])
-            rsi_filter = stock.filter_rsi(n_days=3, max_val=30)
-            adx_filter = stock.filter_adx(n_days=7, min_val=45)
-            if price_filter & avg_vol_filter & issue_type_filter & rsi_filter & adx_filter:
+            if debug:
+                price_filter = stock.filter_price(min_price=1)
+                avg_vol_filter = stock.filter_avg_vol(n_days=50, min_volume=500000)
+                issue_type_filter = stock.filter_issue_type(non_accepted_issue_types=['et'])
+                rsi_filter = stock.filter_rsi(n_days=3, max_val=30)
+                adx_filter = stock.filter_adx(n_days=7, min_val=45)
+                if price_filter & avg_vol_filter & issue_type_filter & rsi_filter & adx_filter:
+                    return True
+            if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
+                    stock.filter_issue_type(accepted_issue_types=['cs']) & stock.filter_rsi(n_days=3, max_val=30) & \
+                    stock.filter_adx(n_days=7, min_val=45):
                 return True
-        if stock.filter_price(min_price=1) & stock.filter_avg_vol(n_days=50, min_volume=500000) & \
-                stock.filter_issue_type(accepted_issue_types=['cs']) & stock.filter_rsi(n_days=3, max_val=30) & \
-                stock.filter_adx(n_days=7, min_val=45):
-            return True
 
     with tqdm.tqdm(total=len(trading_universe)) as prog_bar:
-
         for ticker in trading_universe:
-            ticker = Stock(ticker)
-            ticker.rb_lookup()
-            prog_bar.update()
-            if mean_reversion_long_filters(ticker):
-                potential_trades_tickers.append(ticker.ticker)
-                potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
+            try:
+                ticker = Stock(ticker)
+                ticker.rb_lookup()
+                prog_bar.update()
+                if mean_reversion_long_filters(ticker):
+                    potential_trades_tickers.append(ticker.ticker)
+                    potential_trades_3DayRSI.append(trend.roc(ticker.close).tail(1).iloc[-1])
+            except AttributeError:
+                log
+
+
         temp = list(zip(potential_trades_tickers, potential_trades_3DayRSI))
-        potential_trades = pd.DataFrame(temp, columns=['Symbol', '3 Day RSI']
-                                        ).sort_values(by=potential_trades_3DayRSI, ascending=False).reset_index(drop=True)
+        potential_trades = pd.DataFrame(temp,
+                                        columns=['Symbol', '3 Day RSI']).sort_values(by=potential_trades_3DayRSI,
+                                                                                ascending=False).reset_index(drop=True)
 

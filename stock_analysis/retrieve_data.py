@@ -38,9 +38,12 @@ def clean_single_data(raw_data, debug=False):
                 'Close': [trading_day['close_price'] for trading_day in dict_result['historicals']],
                 'Volume': [trading_day['volume'] for trading_day in dict_result['historicals']]
                                }
-        elif stock_symbol | debug:
+        elif 'stock_symbol' in locals() == True | debug:
             raise RuntimeWarning(f'Stock was not found. Return value was: {dict_result}')
-    frame = pd.DataFrame(data=data_frame_data)
+    try:
+        frame = pd.DataFrame(data=data_frame_data)
+    except NameError:
+        return None
     return frame
 
 

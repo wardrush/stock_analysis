@@ -3,7 +3,7 @@ import requests.exceptions
 # Import strategies
 from stock_analysis.strategy.weekly_rotation_sp500 import WeeklyRotationSP500
 from stock_analysis.strategy.mean_reversion_long import MeanReversionLong
-from stock_analysis.strategy.mean_reversion_short import strategy_mean_reversion_short
+from stock_analysis.strategy.mean_reversion_short import MeanReversionShort
 
 # Set up strategy list to call classes
 strategies = [MeanReversionLong]

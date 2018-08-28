@@ -63,7 +63,7 @@ class MeanReversionLong:
         if self.debug == True:
             test_tick = input('If you would like to override the trading universe with a single ticker, please enter it... ')
             if test_tick.upper():
-                self.trading_universe = [test_tick.upper()] #TODO fix
+                self.trading_universe = [f'{test_tick.upper}']
 
     @staticmethod
     def mean_reversion_long_filters(stock, debug=False):
@@ -95,15 +95,18 @@ class MeanReversionLong:
                             self.logger.info(f'Stock {ticker.ticker} passed tests')
                     except AttributeError:
                         self.logger.warning(f'Stock {ticker.ticker} failed during lookup')
+        try:
+            temp = list(zip(self.potential_trades_tickers, self.potential_trades_3DayRSI))
+            potential_trades = pd.DataFrame(temp, columns=[
+                'Symbol', '3 Day RSI']).sort_values(by=self.potential_trades_3DayRSI,
+                                                    ascending=False).reset_index(drop=True)
 
-        temp = list(zip(self.potential_trades_tickers, self.potential_trades_3DayRSI))
-        potential_trades = pd.DataFrame(temp, columns=[
-            'Symbol', '3 Day RSI']).sort_values(by=self.potential_trades_3DayRSI,
-                                                ascending=False).reset_index(drop=True)
-
-        # Visual non-logging
-        print('\nAnalysis of trading universe completed. Results below...\n')
-        print(potential_trades[:10])
-        print(f'Printing to csv with filename: MeanRevLong week of {datetime.date.isoformat(datetime.date.today())}')
-        potential_trades.to_csv(f'MeanRevLong week of {datetime.date.isoformat(datetime.date.today())}')
-        return potential_trades
+            # Visual non-logging
+            print('\nAnalysis of trading universe completed. Results below...\n')
+            print(potential_trades[:10])
+            print(f'Printing to csv with filename: MeanRevLong week of {datetime.date.isoformat(datetime.date.today())}')
+            potential_trades.to_csv(f'MeanRevLong week of {datetime.date.isoformat(datetime.date.today())}')
+            return potential_trades
+        except IndexError:
+            print('\nNo stocks in the trading universe meet the criteria')
+            return None

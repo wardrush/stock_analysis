@@ -51,6 +51,10 @@ class WeeklyRotationSP500:
         self.potential_trades_tickers = []
         self.potential_trades_200dayROC = []
         self.sp500_filter = Stock.filter_sp500_200day_sma_w_buffer()
+        if self.debug:
+            test_tick = input('If you would like to override the trading universe with a single ticker, please enter it... ')
+            if test_tick.upper():
+                self.trading_universe = [f'{test_tick.upper}']
 
     @staticmethod
     def weekly_rotation_filters(stock, debug=False):
